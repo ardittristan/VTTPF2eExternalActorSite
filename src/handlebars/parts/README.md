@@ -1,0 +1,1 @@
+handlebars partials go here with the `.handlebars` file extension.
