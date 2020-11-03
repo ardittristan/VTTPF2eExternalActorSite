@@ -1,0 +1,61 @@
+.crb-style {
+  display: flex;
+  label,
+  input,
+  select {
+    color: var(--body);
+    line-height: 1;
+  }
+
+  input {
+    border: none;
+    border-radius: 0;
+    &:focus {
+      box-shadow: none;
+      &::placeholder {
+        color: transparent;
+      }
+    }
+    &::placeholder {
+      color: white;
+    }
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
+    &[type="number"] {
+      -moz-appearance: textfield;
+    }
+  }
+
+  select {
+    font-size: 14px;
+    font-family: $serif;
+    font-weight: 500;
+    color: white;
+    position: relative;
+    background-color: var(--alt);
+    border-radius: 2px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 18px 3px 5px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-overflow: ellipsis;
+    background-image: var(--chevron-down);
+    background-repeat: no-repeat;
+    background-position: right 0.25em top 50%;
+    background-size: 1em auto;
+    height: auto;
+    border: 1px solid #53422a;
+  }
+
+  .dots span {
+    cursor: pointer;
+  }
+}
+
+.pf2e.sheet form .tag {
+  font-weight: 700;
+}

@@ -45,11 +45,12 @@ module.exports = {
     },
     module: {
         rules: [
-            { test: /\.(js)$/, exclude: /node_modules/, use: ['babel-loader'] },                                            // allows usage of newer javascript functions that webpack does not support
-            { test: /\.handlebars$/, loader: "handlebars-loader?helperDirs[]=" + __dirname + "/src/handlebars/helpers" },   // allows handlebars usage
-            { test: /\.(otf|jpg)$/, use: { loader: 'url-loader' }},                                                         // allows reading from images/fonts, change extensions if different files needed
-            { test: /\.css$/i, use: ['style-loader', 'css-loader'] },                                                       // loads css
-            { test: /\.hbs$/, loader: "handlebars-loader"}                                                                  // same handlebars loader for the index file
+            { test: /\.(js)$/, exclude: /node_modules/, use: ['babel-loader'] },
+            { test: /\.handlebars$/, loader: "handlebars-loader?helperDirs[]=" + __dirname + "/src/handlebars/helpers" },
+            { test: /\.(otf|jpg)$/, use: { loader: 'url-loader' }},
+            { test: /\.css$/i, use: ['style-loader', 'css-loader'] },
+            { test: /\.hbs$/, loader: "handlebars-loader"},
+            { test: /\.s[ac]ss$/i, use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']}
         ]
     },
     resolve: {

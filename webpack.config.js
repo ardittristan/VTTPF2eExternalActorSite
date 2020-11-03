@@ -40,13 +40,17 @@ module.exports = {
     },
     module: {
         rules: [
-            { test: /\.(js)$/, exclude: /node_modules/, use: ['babel-loader'] },                                            // allows usage of newer javascript functions that webpack does not support
-            { test: /\.handlebars$/, loader: "handlebars-loader?helperDirs[]=" + __dirname + "/src/handlebars/helpers" },   // allows handlebars usage
-            { test: /\.css$/i, use: [MiniCssExtractPlugin.loader, 'css-loader'] }                                           // loads css
+            { test: /\.(js)$/, exclude: /node_modules/, use: ['babel-loader'] },
+            { test: /\.handlebars$/, loader: "handlebars-loader?helperDirs[]=" + __dirname + "/src/handlebars/helpers" },
+            { test: /\.css$/i, use: [MiniCssExtractPlugin.loader, 'css-loader'] },
+            { test: /\.s[ac]ss$/i, use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']}
         ]
     },
     resolve: {
         extensions: ['*', '.js']
+    },
+    devServer: {
+        contentBase: path.join(__dirname, 'dist')
     },
     plugins: [
         new MiniCssExtractPlugin(),

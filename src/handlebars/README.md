@@ -1,1 +1,0 @@
-You can put the main sheet template here with the `.handlebars` file extension. index.hbs is almost the same as index.html in dist, but then built for exporting to a single html file instead of multiple for easier github pages usage.

@@ -1,1 +1,0 @@
-Handlebar helper functions go here.

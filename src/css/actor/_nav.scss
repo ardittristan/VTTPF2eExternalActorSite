@@ -1,0 +1,70 @@
+nav.sheet-navigation {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  height: 20px;
+  background: var(--secondary);
+  background: var(--border-pattern) repeat-x top, var(--border-pattern) repeat-x bottom, var(--secondary);
+  transition: all 0.1s ease-out;
+  box-shadow: 0 -1px 1px rgba(0, 0, 0, 0.25);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  position: relative;
+
+  span {
+    color: white;
+    margin-right: auto;
+    padding-left: 1rem;
+  }
+
+  a {
+    @include flex-center;
+    height: 24px;
+    width: 24px;
+    margin: 0 6px;
+    border-radius: 50%;
+    z-index: 1;
+    transition: all 0.1s ease-out;
+    color: var(--tertiary);
+    font-size: 12px;
+    background-image: var(--nav-item-inactive);
+    background-size: contain;
+
+    /* prettier-ignore */
+    box-shadow:
+            0 0 0 1px var(--tertiary),
+            0 0 0 2px #9f725b,
+            inset 0 0 4px rgba(black, 0.25);
+
+    &.active {
+      box-shadow: 0 0 0 1px var(--tertiary), 0 0 0 2px #9f725b, inset 0 0 4px rgba(black, 0.25), 0 0 8px var(--tertiary);
+    }
+
+    &:last-child {
+      margin-right: 10px;
+    }
+
+    &:hover,
+    &.active {
+      z-index: 2;
+      height: 28px;
+      width: 28px;
+      margin: 0 4px;
+      color: white;
+      background-image: var(--nav-item);
+
+      &:last-child {
+        margin-right: 8px;
+      }
+    }
+
+    .fas {
+      padding-bottom: 0;
+    }
+
+    .pfs-icon {
+      border: none;
+      padding: 4px;
+    }
+  }
+}
