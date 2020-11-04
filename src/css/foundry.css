@@ -630,9 +630,6 @@ input[type="range"] + .range-value {
   flex-direction: column;
   flex-wrap: nowrap;
 }
-* {
-  flex: 1;
-}
 .flex0 {
   display: block;
   flex: 0;

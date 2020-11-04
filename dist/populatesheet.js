@@ -81,12 +81,12 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 401);
+/******/ 	return __webpack_require__(__webpack_require__.s = 404);
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ 401:
+/***/ 404:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -239,9 +239,9 @@ class Tabs {
  */
 
 const tabs = [{
-  navSelector: ".tabs",
-  contentSelector: ".sheet-body",
-  initial: "description"
+  navSelector: ".sheet-navigation",
+  contentSelector: ".sheet-content",
+  initial: "character"
 }];
 
 const _tabs = createTabHandlers();
@@ -267,7 +267,7 @@ function populateSheet(sheetTemplate, actorData, baseUrl) {
    * here you send the data that the handlebars template reads from to the template
    */
 
-  $(".window-content")[0].innerHTML = sheetTemplate({
+  const templateObject = {
     actor: data.actorData,
     data: data.actorData.data,
     items: data.actorData.items,
@@ -275,7 +275,9 @@ function populateSheet(sheetTemplate, actorData, baseUrl) {
     isNPC: data.actorData.data.type === "npc",
     owner: true,
     baseUrl: baseUrl
-  }, {
+  };
+  console.log(templateObject);
+  $(".window-content")[0].innerHTML = sheetTemplate(templateObject, {
     allowedProtoProperties: {
       size: true
     }
@@ -311,6 +313,47 @@ function activateListeners() {
   const html = $(".window-content").first(); // bind tabs to pages
 
   _tabs.forEach(t => t.bind(html[0]));
+
+  {
+    // ensure correct tab name is displayed after actor update
+    const title = $(".sheet-navigation .active").data("tabTitle");
+
+    if (title) {
+      html.find(".navigation-title").text(title);
+    }
+  }
+  html.find(".sheet-navigation").on("mouseover", ".item", event => {
+    const title = event.currentTarget.dataset.tabTitle;
+
+    if (title) {
+      $(event.currentTarget).parents(".sheet-navigation").find(".navigation-title").text(title);
+    }
+  });
+  html.find(".sheet-navigation").on("mouseout", ".item", event => {
+    const parent = $(event.currentTarget).parents(".sheet-navigation");
+    const title = parent.find(".item.active").data("tabTitle");
+
+    if (title) {
+      parent.find(".navigation-title").text(title);
+    }
+  }); // handle sub-tab navigation on the actions tab
+
+  html.find(".actions-nav").on("click", ".tab:not(.tab-active)", event => {
+    const target = $(event.currentTarget);
+    const nav = target.parents(".actions-nav"); // deselect current tab and panel
+
+    nav.children(".tab-active").removeClass("tab-active");
+    nav.siblings(".actions-panels").children(".actions-panel.active").removeClass("active"); // select new tab and panel
+
+    target.addClass("tab-active");
+    nav.siblings(".actions-panels").children(`#${target.data("panel")}`).addClass("active");
+  }); // Pad field width
+
+  html.find('[data-wpad]').each((i, e) => {
+    const text = e.tagName === 'INPUT' ? e.value : e.innerText;
+    const w = text.length * parseInt(e.getAttribute('data-wpad'), 10) / 2;
+    e.setAttribute('style', `flex: 0 0 ${w}px`);
+  });
 }
 /* -------------------------------------------- */
 

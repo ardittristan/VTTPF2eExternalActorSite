@@ -1,35 +1,35 @@
 <form class="{{cssClass}} crb-style{{#if isProficiencyLocked}} proficiency-lock{{/if}}" autocomplete="off">
   <aside>
-    <img class="logo" src="{{baseUrl}}systems/pf2e/assets/pathfinder_logo.png" height="56" alt="" srcset="" />
+    <img class="logo" src="{{@root.baseUrl}}systems/pf2e/assets/pathfinder_logo.png" height="56" alt="" srcset="" />
     <div class="sidebar" data-group="dashboard" data-tab="sidebar">
       <!-- HEALTH -->
-      {{> ./sidebar/actor-health.handlebars}}
+      {{> ./sidebar/actor-health}}
 
       <!-- STAMINA (if enabled) -->
-      {{#if hasStamina}} {{> ./sidebar/actor-stamina.handlebars}} {{/if}}
+      {{#if hasStamina}} {{> ./sidebar/actor-stamina}} {{/if}}
 
       <!-- ARMOR CLASS -->
-      {{> ./sidebar/actor-armorclass.handlebars}}
+      {{> ./sidebar/actor-armorclass}}
 
       <!-- Perception -->
-      {{> ./sidebar/actor-perception.handlebars}}
+      {{> ./sidebar/actor-perception}}
 
       <!-- Class DC -->
-      {{> ./sidebar/actor-class-dc.handlebars}}
+      {{> ./sidebar/actor-class-dc}}
 
       <!-- Initiative -->
-      {{> ./sidebar/actor-initiative.handlebars}}
+      {{> ./sidebar/actor-initiative}}
 
       <!-- Saves -->
-      {{> ./sidebar/actor-saves.handlebars}}
+      {{> ./sidebar/actor-saves}}
 
       <!-- Resistances -->
-      {{> ./sidebar/actor-resistances.handlebars}}
+      {{> ./sidebar/actor-resistances}}
     </div>
   </aside>
 
   <!-- HEADER -->
-  {{> ./actor-header.handlebars}}
+  {{> ./actor-header}}
 
   <!-- SHEET NAVIGATION -->
   <nav class="sheet-navigation" data-group="primary">
@@ -67,7 +67,7 @@
     </a>
 
     <a class="item" data-tab="pfs" data-tab-title="{{stringify 'PF2E.TabPathfinderSociety'}}">
-      <img class="pfs-icon" src="{{baseUrl}}systems/pf2e/assets/icons/pfs.svg" alt="Pathfinder Society" />
+      <img class="pfs-icon" src="{{@root.baseUrl}}systems/pf2e/assets/icons/pfs.svg" alt="Pathfinder Society" />
     </a>
   </nav>
 
@@ -75,31 +75,31 @@
   <section class="sheet-body">
     <section class="sheet-content">
       <!-- Character -->
-      {{> ./tabs/actor-character.handlebars }}
+      {{> ./tabs/actor-character }}
 
       <!-- Actions -->
-      {{> ./tabs/actor-actions.handlebars }}
+      {{> ./tabs/actor-actions }}
 
       <!-- Effects -->
-      {{> ./tabs/actor-effects.handlebars }}
+      {{> ./tabs/actor-effects }}
 
       <!-- INVENTORY -->
-      {{> ./tabs/actor-inventory.handlebars }}
+      {{> ./tabs/actor-inventory }}
 
       <!-- SPELLBOOK -->
-      {{> ./tabs/actor-spellbook.handlebars }}
+      {{> ./tabs/actor-spellbook }}
 
       <!-- SKILLS -->
-      {{> ./tabs/actor-skills.handlebars }}
+      {{> ./tabs/actor-skills }}
 
       <!-- FEATS -->
-      {{> ./tabs/actor-feats.handlebars }}
+      {{> ./tabs/actor-feats }}
 
       <!-- BIOGRAPHY -->
-      {{> ./tabs/actor-biography.handlebars }}
+      {{> ./tabs/actor-biography }}
 
       <!-- Pathfinder Society -->
-      {{> ./tabs/actor-pfs.handlebars }}
+      {{> ./tabs/actor-pfs }}
     </section>
   </section>
 </form>

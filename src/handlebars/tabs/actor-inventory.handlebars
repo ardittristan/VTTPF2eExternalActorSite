@@ -37,7 +37,7 @@
         <ol class="item-list">
             {{#each section.items as |item itemId|}}
                 {{#if item.isNotInContainer}}
-                    {{> ./item-line.handlebars item=item owner=../../owner level=1}}
+                    {{> ./item-line item=item owner=../../owner level=1}}
                 {{/if}}
             {{/each}}
         </ol>
@@ -46,7 +46,7 @@
 
     {{#with data.attributes.encumbrance}}
     <div class="encumbrance {{#if isEncumbered}}encumbered{{/if}} {{#if isOverLimit}}over-limit{{/if}}">
-        <img src="systems/pf2e/icons/equipment/adventuring-gear/backpack.jpg" alt="Encumbrance">
+        <img src="{{@root.baseUrl}}systems/pf2e/icons/equipment/adventuring-gear/backpack.jpg" alt="Encumbrance">
         <span class="encumbrance-bar" style="width:{{limitPercentageMax100}}%"></span>
         <div class="encumbrance-label">
             <span>{{stringify 'PF2E.BulkLabel'}} {{bulk}} / {{stringify 'PF2E.ConditionTypeEncumbered'}}: {{encumberedAt}}</span>

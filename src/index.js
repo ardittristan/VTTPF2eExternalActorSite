@@ -13,6 +13,8 @@ Hooks.emit("start");
 
 // when document is loaded, add sheet
 document.addEventListener("DOMContentLoaded", async function () {
+  document.body.style.setProperty("--headerHeight", $("body > div.header").height() + "px");
+
   if (window.location.href.split(/\?(.+)/)[1] == undefined) {
     notFoundError("No Link Entered");
     return;
@@ -60,7 +62,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     styleArray.forEach((entry) => {
       styleString = styleString.concat(`--${entry[0]}: url('${baseUrl}${entry[1]}');\n`);
     });
-    styleElement.innerHTML = styleString;
+    styleElement.innerHTML = ":root {\n" + styleString + "}";
     document.head.append(styleElement);
 
     /**
@@ -72,7 +74,8 @@ document.addEventListener("DOMContentLoaded", async function () {
      * emit hook that populatesheet.js listens to
      */
     Hooks.emit("showSheet", sheetTemplate, actorData, baseUrl);
-  } catch {
+  } catch (e) {
+    console.log(e);
     notFoundError("URL not found");
   }
 
@@ -100,7 +103,7 @@ function getJSON(url) {
   return new Promise((resolve, reject) => {
     $.ajax({
       dataType: "json",
-      url: /*//!! 'https://cors-anywhere.herokuapp.com/' + */ url,
+      url: proxyUrl + url,
       success: (data) => resolve(data),
       error: () => reject(),
     });

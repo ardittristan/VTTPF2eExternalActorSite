@@ -4,7 +4,7 @@
             <img
                 class="player-image"
                 alt="{{actor.name}}"
-                src="{{actor.img}}"
+                src="{{@root.baseUrl}}{{actor.img}}"
                 title="{{actor.name}}"
                 data-edit="img"
             />
@@ -40,7 +40,7 @@
                 />
             </div>
             <img
-                src="{{data.details.deity.image}}"
+                src="{{@root.baseUrl}}{{data.details.deity.image}}"
                 alt="{{data.details.deity.value}}"
                 title="{{stringify 'PF2E.DeityTitle'}}"
                 data-edit="data.details.deity.image"
@@ -166,12 +166,12 @@
 
     <hr style="margin-top: 1rem;">
     <section class="character-traits">
-        {{> ../character-traits.handlebars}}
+        {{> ../character-traits}}
     </section>
 
     <h3>{{stringify 'PF2E.AbilityScoresHeader'}}</h3>
     <section class="character-abilities">
-        {{> ../character-abilities.handlebars}}
+        {{> ../character-abilities}}
     </section>
 
     <footer>

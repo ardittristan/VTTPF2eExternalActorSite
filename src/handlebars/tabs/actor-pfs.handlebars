@@ -73,7 +73,7 @@
         {{#each section.feats as |feat fid|}}
         <li class="item feat-item" data-item-id="{{feat._id}}">
             <div class="item-name rollable">
-                <img class="item-image" src="{{feat.img}}" alt="{{feat.name}}">
+                <img class="item-image" src="{{@root.baseUrl}}{{feat.img}}" alt="{{feat.name}}">
                 <h4>{{feat.name}}</h4>
             </div>
             {{#if ../../owner}}

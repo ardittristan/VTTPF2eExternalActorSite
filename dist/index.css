@@ -635,9 +635,6 @@ input[type="range"] + .range-value {
   flex-direction: column;
   flex-wrap: nowrap;
 }
-* {
-  flex: 1;
-}
 .flex0 {
   display: block;
   flex: 0;
@@ -690,8 +687,23 @@ input[type="range"] + .range-value {
   width: 96%;
 }
 
-body {
+.window-content {
+  height: calc(100% - var(--headerHeight));
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  padding: 8px;
+  color: #191813;
   overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.window-content .crb-style {
+  flex: 1;
+}
+
+body {
   background-color: #2f2f2f;
 }
 .window-content select {
