@@ -90,7 +90,41 @@ function getData(actorData, baseUrl) {
     actorData.data.saves[key].rankName = PF2E.proficiencyLevels[actorData.data.saves[key].rank];
   });
 
-  prepareItems(actorData)
+  // heroPoints
+  if (actorData.data.attributes.heroPoints) {
+    actorData.data.attributes.heroPoints.icon = getHeroPointsIcon(actorData.data.attributes.heroPoints.rank);
+    actorData.data.attributes.heroPoints.hover = PF2E.heroPointLevels[actorData.data.attributes.heroPoints.rank];
+  }
+
+  // dying
+  if (actorData.data.attributes.dying) {
+    actorData.data.attributes.dying.containerWidth = `width: ${actorData.data.attributes.dying.max * 13}px;`;
+    actorData.data.attributes.dying.icon = getDyingIcon(actorData.data.attributes.dying.value, actorData);
+  }
+
+  // wounded
+  if (actorData.data.attributes.wounded) {
+    actorData.data.attributes.wounded.icon = getWoundedIcon(actorData.data.attributes.wounded.value, actorData);
+    actorData.data.attributes.wounded.max = actorData.data.attributes.dying.max - 1;
+  }
+
+  // doomed
+  if (actorData.data.attributes.doomed) {
+    actorData.data.attributes.doomed.icon = getDoomedIcon(actorData.data.attributes.doomed.value, actorData);
+    actorData.data.attributes.doomed.max = actorData.data.attributes.dying.max - 1;
+  }
+
+  // perception text
+  if (actorData.data.attributes?.perception?.rank) {
+    actorData.data.attributes.perception.rankName = PF2E.proficiencyLevels[actorData.data.attributes.perception.rank]
+  }
+
+  // class dc text
+  if (actorData.data.attributes?.classDC?.rank) {
+    actorData.data.attributes.classDC.rankName = PF2E.proficiencyLevels[actorData.data.attributes.classDC.rank]
+  }
+
+  prepareItems(actorData);
 
   // traits
   prepareTraits(actorData.data.traits);
@@ -158,12 +192,6 @@ function activateListeners() {
 
 /* -------------------------------------------- */
 /*   Helper Functions                           */
-/* -------------------------------------------- */
-
-/**
- * put any other helper functions here
- */
-
 /* -------------------------------------------- */
 
 function createTabHandlers() {
@@ -632,6 +660,85 @@ function getProficiencyIcon(level) {
 
 function getEquippedShield(items) {
   return items.find((item) => item.type === "armor" && item.data.equipped.value && item.data.armorType.value === "shield");
+}
+
+/* -------------------------------------------- */
+
+function getHeroPointsIcon(level) {
+  const icons = {
+    0: '<i class="far fa-circle"></i><i class="far fa-circle"></i><i class="far fa-circle"></i>',
+    1: '<i class="fas fa-hospital-symbol"></i><i class="far fa-circle"></i><i class="far fa-circle"></i>',
+    2: '<i class="fas fa-hospital-symbol"></i><i class="fas fa-hospital-symbol"></i><i class="far fa-circle"></i>',
+    3: '<i class="fas fa-hospital-symbol"></i><i class="fas fa-hospital-symbol"></i><i class="fas fa-hospital-symbol"></i>',
+  };
+  return icons[level];
+}
+
+/* -------------------------------------------- */
+
+function getDyingIcon(level, actorData) {
+  const maxDying = actorData.data.attributes.dying.max || 4;
+  const doomed = actorData.data.attributes.doomed.value || 0;
+  const circle = '<i class="far fa-circle"></i>';
+  const cross = '<i class="fas fa-times-circle"></i>';
+  const skull = '<i class="fas fa-skull"></i>';
+  const redOpen = "<span>";
+  const redClose = "</span>";
+  const icons = {};
+
+  for (let dyingLevel = 0; dyingLevel <= maxDying; dyingLevel++) {
+    icons[dyingLevel] = dyingLevel === maxDying ? redOpen : "";
+    for (let column = 1; column <= maxDying; column++) {
+      if (column >= maxDying - doomed || dyingLevel === maxDying) {
+        icons[dyingLevel] += skull;
+      } else if (dyingLevel < column) {
+        icons[dyingLevel] += circle;
+      } else {
+        icons[dyingLevel] += cross;
+      }
+    }
+    icons[dyingLevel] += dyingLevel === maxDying ? redClose : "";
+  }
+
+  return icons[level];
+}
+
+/* -------------------------------------------- */
+
+function getWoundedIcon(level, actorData) {
+  const maxDying = actorData.data.attributes.dying.max || 4;
+  const icons = {};
+  const usedPoint = '<i class="fas fa-dot-circle"></i>';
+  const unUsedPoint = '<i class="far fa-circle"></i>';
+
+  for (let i = 0; i < maxDying; i++) {
+    let iconHtml = "";
+    for (let iconColumn = 1; iconColumn < maxDying; iconColumn++) {
+      iconHtml += iconColumn <= i ? usedPoint : unUsedPoint;
+    }
+    icons[i] = iconHtml;
+  }
+
+  return icons[level];
+}
+
+/* -------------------------------------------- */
+
+function getDoomedIcon(level, actorData) {
+  const maxDying = actorData.data.attributes.dying.max || 4;
+  const icons = {};
+  const usedPoint = '<i class="fas fa-skull"></i>';
+  const unUsedPoint = '<i class="far fa-circle"></i>';
+
+  for (let i = 0; i < maxDying; i++) {
+    let iconHtml = "";
+    for (let iconColumn = 1; iconColumn < maxDying; iconColumn++) {
+      iconHtml += iconColumn <= i ? usedPoint : unUsedPoint;
+    }
+    icons[i] = iconHtml;
+  }
+
+  return icons[level];
 }
 
 /* -------------------------------------------- */

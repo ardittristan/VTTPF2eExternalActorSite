@@ -390,4 +390,11 @@ pf2eConf.proficiencyLevels = {
   4: "Legendary",
 };
 
+pf2eConf.heroPointLevels = {
+  0: "Zero Hero Points",
+  1: "One Hero Point",
+  2: "Two Hero Points",
+  3: "Three Hero Points",
+};
+
 export default pf2eConf;
