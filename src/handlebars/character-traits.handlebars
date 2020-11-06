@@ -175,11 +175,9 @@
         name="data.traits.size.value"
         data-dtype="{{data.traits.size.type}}"
     >
-        {{#select data.traits.size.value}} {{#each actorSizes as |label size|}}
-        <option value="{{size}}">
-            {{label}}
+        <option value="{{data.traits.size.value}}">
+            {{data.traits.size.value}}
         </option>
-        {{/each}} {{/select}}
     </select>
 </div>
 <div class="pc pc_key-ability dropdown">
@@ -187,11 +185,9 @@
         {{stringify 'PF2E.KeyAbilityLabel'}}
     </label>
     <select id="key-ability" name="data.details.keyability.value">
-        {{#select data.details.keyability.value}}
-            {{#each abilities as |label ability|}}
-                <option value="{{ability}}">{{label}}</option>
-            {{/each}}
-        {{/select}}
+        <option value="{{data.details.keyability.value}}">
+            {{data.details.keyability.value}}
+        </option>
     </select>
 </div>
 <div class="tags">

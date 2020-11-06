@@ -14,16 +14,7 @@
                 class="bio-alignment pf-value pf-small"
                 title="{{stringify 'PF2E.AlignmentTitle'}}"
             >
-                <select
-                name="data.details.alignment.value"
-                data-dtype="text"
-                >
-                    {{#select data.details.alignment.value}}
-                        {{#each alignment as |label key|}}
-                        <option value="{{key}}">{{label}}</option>
-                        {{/each}}
-                    {{/select}}
-                </select>
+            {{data.details.alignment.value}}
             </span>
         </div>
         <div class="deity">

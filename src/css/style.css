@@ -17,6 +17,15 @@
   flex: 1;
 }
 
+.bio-alignment.pf-value.pf-small {
+  font-weight: 700;
+  display:block;
+  font-size: 14px;
+  margin-top: 2px;
+  text-transform: capitalize;
+  line-height: 1;
+}
+
 body {
   background-color: #2f2f2f;
 }
