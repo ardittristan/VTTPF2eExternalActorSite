@@ -397,4 +397,41 @@ pf2eConf.heroPointLevels = {
   3: "Three Hero Points",
 };
 
+pf2eConf.martialSkills = {
+  advanced: "Advanced Weapons",
+  heavy: "Heavy Armor",
+  light: "Light Armor",
+  martial: "Martial Weapons",
+  medium: "Medium Armor",
+  simple: "Simple Weapons",
+  unarmed: "Unarmed",
+  unarmored: "Unarmored",
+};
+
+pf2eConf.skills = {
+  acr: "Acrobatics",
+  arc: "Arcana",
+  ath: "Athletics",
+  cra: "Crafting",
+  dec: "Deception",
+  dip: "Diplomacy",
+  itm: "Intimidation",
+  med: "Medicine",
+  nat: "Nature",
+  occ: "Occultism",
+  prf: "Performance",
+  rel: "Religion",
+  soc: "Society",
+  ste: "Stealth",
+  sur: "Survival",
+  thi: "Thievery",
+};
+
+pf2eConf.currencies = {
+  cp: "Copper",
+  gp: "Gold",
+  pp: "Platinum",
+  sp: "Silver",
+};
+
 export default pf2eConf;

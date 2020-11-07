@@ -2,9 +2,9 @@ import Tabs from "./libs/tabs.js";
 import localize from "./handlebars/helpers/stringify";
 import { ProficiencyModifier } from "./libs/modifiers";
 import { ConditionManager } from "./libs/conditions";
-import TextEditor from "./libs/TextEditor"
+import TextEditor from "./libs/TextEditor";
 
-TextEditor._decoder = document.createElement('textarea')
+TextEditor._decoder = document.createElement("textarea");
 
 /**
  * might be different for different systems, but this initializes the sheet tabs
@@ -120,23 +120,53 @@ function getData(actorData, baseUrl) {
 
   // perception text
   if (actorData.data.attributes?.perception?.rank) {
-    actorData.data.attributes.perception.rankName = PF2E.proficiencyLevels[actorData.data.attributes.perception.rank]
+    actorData.data.attributes.perception.rankName = PF2E.proficiencyLevels[actorData.data.attributes.perception.rank];
   }
 
   // class dc text
   if (actorData.data.attributes?.classDC?.rank) {
-    actorData.data.attributes.classDC.rankName = PF2E.proficiencyLevels[actorData.data.attributes.classDC.rank]
+    actorData.data.attributes.classDC.rankName = PF2E.proficiencyLevels[actorData.data.attributes.classDC.rank];
+  }
+
+  // martial skills
+  if (actorData.data?.martial) {
+    for (const [s, skl] of Object.entries(actorData.data.martial)) {
+      skl.icon = getProficiencyIcon(skl.rank);
+      skl.hover = PF2E.proficiencyLevels[skl.rank];
+      skl.label = PF2E.martialSkills[s];
+      skl.value = ProficiencyModifier.fromLevelAndRank(actorData.data.details.level.value, skl.rank || 0).modifier;
+    }
+  }
+
+  // skill labels
+  if (actorData.data?.skills) {
+    for (const [s, skl] of Object.entries(actorData.data.skills)) {
+      skl.icon = getProficiencyIcon(skl.rank);
+      skl.hover = PF2E.proficiencyLevels[skl.rank];
+      skl.label = skl.label ?? PF2E.skills[s];
+    }
   }
 
   prepareItems(actorData);
+
+  // currency based on items
+  if (actorData.items) {
+    const treasure = calculateWealth(actorData.items);
+    actorData.totalTreasure = {};
+    for (const [denomination, value] of Object.entries(treasure)) {
+      actorData.totalTreasure[denomination] = {
+        value,
+        label: PF2E.currencies[denomination],
+      };
+    }
+  }
 
   // traits
   prepareTraits(actorData.data.traits);
 
   actorData.data.effects = {};
 
-  actorData.data.effects.conditions = ConditionManager.getFlattenedConditions(actorData.items.filter(i => i.flags.pf2e?.condition && i.type === 'condition'));
-
+  actorData.data.effects.conditions = ConditionManager.getFlattenedConditions(actorData.items.filter((i) => i.flags.pf2e?.condition && i.type === "condition"));
 
   return {
     actorData,
@@ -748,6 +778,53 @@ function getDoomedIcon(level, actorData) {
   }
 
   return icons[level];
+}
+
+/* -------------------------------------------- */
+
+function calculateWealth(items) {
+  return items
+      .filter(item => item.type === 'treasure'
+          && item?.data?.denomination?.value !== undefined
+          && item?.data?.denomination?.value !== null)
+      .map(item => {
+          const value = (item.data?.value?.value ?? 1) * (item.data?.quantity?.value ?? 1);
+          return toCoins(item.data.denomination.value, value);
+      })
+      .reduce(combineCoins, noCoins());
+}
+
+/* -------------------------------------------- */
+
+function toCoins(denomination, value) {
+  return {
+      pp: denomination === 'pp' ? value : 0,
+      gp: denomination === 'gp' ? value : 0,
+      sp: denomination === 'sp' ? value : 0,
+      cp: denomination === 'cp' ? value : 0,
+  };
+}
+
+/* -------------------------------------------- */
+
+function combineCoins(first, second) {
+  return {
+      pp: first.pp + second.pp,
+      gp: first.gp + second.gp,
+      sp: first.sp + second.sp,
+      cp: first.cp + second.cp,
+  };
+}
+
+/* -------------------------------------------- */
+
+function noCoins() {
+  return {
+      pp: 0,
+      gp: 0,
+      sp: 0,
+      cp: 0,
+  };
 }
 
 /* -------------------------------------------- */
