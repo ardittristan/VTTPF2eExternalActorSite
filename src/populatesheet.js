@@ -3,6 +3,9 @@ import localize from "./handlebars/helpers/stringify";
 import { ProficiencyModifier } from "./libs/modifiers";
 import { ConditionManager } from "./libs/conditions";
 import TextEditor from "./libs/TextEditor";
+import { getContainerMap } from "./libs/container";
+import {indexBulkItemsById, itemsFromActorData, stacks, calculateBulk, formatBulk} from "./libs/bulk"
+import {calculateEncumbrance} from "./libs/encumbrance"
 
 TextEditor._decoder = document.createElement("textarea");
 
@@ -44,6 +47,7 @@ function populateSheet(sheetTemplate, actorData, baseUrl) {
     isCharacter: data.actorData.data.type === "character",
     isNPC: data.actorData.data.type === "npc",
     hasStamina: data.actorData.flags?.externalactor?.hasStamina || false,
+    totalTreasure: data.actorData.totalTreasure,
     owner: true,
     baseUrl: baseUrl,
   };
@@ -51,6 +55,13 @@ function populateSheet(sheetTemplate, actorData, baseUrl) {
   $(".window-content")[0].innerHTML = sheetTemplate(templateObject, {
     allowedProtoProperties: {
       size: true,
+      isCollapsed: true,
+      isOverLoaded: true,
+      fullPercentageMax100: true,
+      isEncumbered: true,
+      isOverLimit: true,
+      limitPercentageMax100: true,
+      bulk: true
     },
   });
 
@@ -344,21 +355,21 @@ function prepareItems(actorData) {
 
   // Iterate through items, allocating to containers
   // const bulkConfig = {
-  //     ignoreCoinBulk: game.settings.get('pf2e', 'ignoreCoinBulk'),
-  //     ignoreContainerOverflow: game.settings.get('pf2e', 'ignoreContainerOverflow'),
+  //   ignoreCoinBulk: game.settings.get("pf2e", "ignoreCoinBulk"),
+  //   ignoreContainerOverflow: game.settings.get("pf2e", "ignoreContainerOverflow"),
   // };
 
-  // const bulkItems = itemsFromActorData(actorData);
-  // const indexedBulkItems = indexBulkItemsById(bulkItems);
-  // const containers = getContainerMap(actorData.items, indexedBulkItems, stacks, bulkConfig);
+  const bulkItems = itemsFromActorData(actorData);
+  const indexedBulkItems = indexBulkItemsById(bulkItems);
+  const containers = getContainerMap(actorData.items, indexedBulkItems, stacks, /* bulkConfig */);
 
   let investedCount = 0; // Tracking invested items
 
   for (const i of actorData.items) {
     i.img = i.img || "icons/svg/mystery-man.svg";
-    // i.containerData = containers.get(i._id);
-    // i.isContainer = i.containerData.isContainer;
-    // i.isNotInContainer = i.containerData.isNotInContainer;
+    i.containerData = containers.get(i._id);
+    i.isContainer = i.containerData.isContainer;
+    i.isNotInContainer = i.containerData.isNotInContainer;
 
     // Read-Only Equipment
     if (i.type === "armor" || i.type === "equipment" || i.type === "consumable" || i.type === "backpack") {
@@ -366,7 +377,7 @@ function prepareItems(actorData) {
       actorData.hasEquipment = true;
     }
 
-    // i.canBeEquipped = i.isNotInContainer;
+    i.canBeEquipped = i.isNotInContainer;
     i.isEquipped = i.data?.equipped?.value ?? false;
     i.isSellableTreasure = i.type === "treasure" && i.data?.stackGroup?.value !== "coins";
     i.hasInvestedTrait = i.data?.traits?.value?.includes("invested") ?? false;
@@ -379,8 +390,8 @@ function prepareItems(actorData) {
     if (Object.keys(inventory).includes(i.type)) {
       i.data.quantity.value = i.data.quantity.value || 0;
       i.data.weight.value = i.data.weight.value || 0;
-      // const [approximatedBulk] = calculateBulk([indexedBulkItems.get(i._id)], stacks, false, bulkConfig);
-      // i.totalWeight = formatBulk(approximatedBulk);
+      const [approximatedBulk] = calculateBulk([indexedBulkItems.get(i._id)], stacks, false, /* bulkConfig */);
+      i.totalWeight = formatBulk(approximatedBulk);
       i.hasCharges = i.type === "consumable" && i.data.charges.max > 0;
       i.isTwoHanded = i.type === "weapon" && !!(i.data.traits.value || []).find((x) => x.startsWith("two-hand"));
       i.wieldedTwoHanded = i.type === "weapon" && (i.data.hands || {}).value;
@@ -641,30 +652,30 @@ function prepareItems(actorData) {
 
   // Inventory encumbrance
   // FIXME: this is hard coded for now
-  // const featNames = new Set(actorData.items
-  //   .filter(item => item.type === 'feat')
-  //   .map(item => item.name));
+  const featNames = new Set(actorData.items
+    .filter(item => item.type === 'feat')
+    .map(item => item.name));
 
-  // let bonusEncumbranceBulk = actorData.data.attributes.bonusEncumbranceBulk ?? 0;
-  // let bonusLimitBulk = actorData.data.attributes.bonusLimitBulk ?? 0;
-  // if (featNames.has('Hefty Hauler')) {
-  //   bonusEncumbranceBulk += 2;
-  //   bonusLimitBulk += 2;
-  // }
-  // const equippedLiftingBelt = actorData.items
-  //   .find(item => item.name === 'Lifting Belt' && item.data.equipped.value) !== undefined;
-  // if (equippedLiftingBelt) {
-  //   bonusEncumbranceBulk += 1;
-  //   bonusLimitBulk += 1;
-  // }
-  // const [bulk] = calculateBulk(bulkItems, stacks, false, bulkConfig);
-  // actorData.data.attributes.encumbrance = calculateEncumbrance(
-  //   actorData.data.abilities.str.mod,
-  //   bonusEncumbranceBulk,
-  //   bonusLimitBulk,
-  //   bulk,
-  //   actorData.data?.traits?.size?.value ?? 'med',
-  // );
+  let bonusEncumbranceBulk = actorData.data.attributes.bonusEncumbranceBulk ?? 0;
+  let bonusLimitBulk = actorData.data.attributes.bonusLimitBulk ?? 0;
+  if (featNames.has('Hefty Hauler')) {
+    bonusEncumbranceBulk += 2;
+    bonusLimitBulk += 2;
+  }
+  const equippedLiftingBelt = actorData.items
+    .find(item => item.name === 'Lifting Belt' && item.data.equipped.value) !== undefined;
+  if (equippedLiftingBelt) {
+    bonusEncumbranceBulk += 1;
+    bonusLimitBulk += 1;
+  }
+  const [bulk] = calculateBulk(bulkItems, stacks, false, /* bulkConfig */);
+  actorData.data.attributes.encumbrance = calculateEncumbrance(
+    actorData.data.abilities.str.mod,
+    bonusEncumbranceBulk,
+    bonusLimitBulk,
+    bulk,
+    actorData.data?.traits?.size?.value ?? 'Medium',
+  );
 }
 
 /* -------------------------------------------- */
@@ -784,24 +795,22 @@ function getDoomedIcon(level, actorData) {
 
 function calculateWealth(items) {
   return items
-      .filter(item => item.type === 'treasure'
-          && item?.data?.denomination?.value !== undefined
-          && item?.data?.denomination?.value !== null)
-      .map(item => {
-          const value = (item.data?.value?.value ?? 1) * (item.data?.quantity?.value ?? 1);
-          return toCoins(item.data.denomination.value, value);
-      })
-      .reduce(combineCoins, noCoins());
+    .filter((item) => item.type === "treasure" && item?.data?.denomination?.value !== undefined && item?.data?.denomination?.value !== null)
+    .map((item) => {
+      const value = (item.data?.value?.value ?? 1) * (item.data?.quantity?.value ?? 1);
+      return toCoins(item.data.denomination.value, value);
+    })
+    .reduce(combineCoins, noCoins());
 }
 
 /* -------------------------------------------- */
 
 function toCoins(denomination, value) {
   return {
-      pp: denomination === 'pp' ? value : 0,
-      gp: denomination === 'gp' ? value : 0,
-      sp: denomination === 'sp' ? value : 0,
-      cp: denomination === 'cp' ? value : 0,
+    pp: denomination === "pp" ? value : 0,
+    gp: denomination === "gp" ? value : 0,
+    sp: denomination === "sp" ? value : 0,
+    cp: denomination === "cp" ? value : 0,
   };
 }
 
@@ -809,10 +818,10 @@ function toCoins(denomination, value) {
 
 function combineCoins(first, second) {
   return {
-      pp: first.pp + second.pp,
-      gp: first.gp + second.gp,
-      sp: first.sp + second.sp,
-      cp: first.cp + second.cp,
+    pp: first.pp + second.pp,
+    gp: first.gp + second.gp,
+    sp: first.sp + second.sp,
+    cp: first.cp + second.cp,
   };
 }
 
@@ -820,10 +829,10 @@ function combineCoins(first, second) {
 
 function noCoins() {
   return {
-      pp: 0,
-      gp: 0,
-      sp: 0,
-      cp: 0,
+    pp: 0,
+    gp: 0,
+    sp: 0,
+    cp: 0,
   };
 }
 
