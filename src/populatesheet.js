@@ -6,6 +6,7 @@ import TextEditor from "./libs/TextEditor";
 import { getContainerMap } from "./libs/container";
 import {indexBulkItemsById, itemsFromActorData, stacks, calculateBulk, formatBulk, defaultBulkConfig} from "./libs/bulk"
 import {calculateEncumbrance} from "./libs/encumbrance"
+import {ChatData} from "./libs/ChatData"
 
 TextEditor._decoder = document.createElement("textarea");
 
@@ -65,7 +66,7 @@ function populateSheet(sheetTemplate, actorData, baseUrl) {
     },
   });
 
-  activateListeners();
+  activateListeners(actorData);
 }
 
 /* -------------------------------------------- */
@@ -187,7 +188,7 @@ function getData(actorData, baseUrl) {
 
 /* -------------------------------------------- */
 
-function activateListeners() {
+function activateListeners(actorData) {
   // sheet object
   const html = $(".window-content").first();
 
@@ -217,6 +218,17 @@ function activateListeners() {
     }
   });
 
+  // item summary
+  html.find('.item .item-name h4').click((event) => {
+    onItemSummary(event, actorData);
+  });
+
+  // strike summary
+  html.find('.strikes-list [data-action-index]').on('click', '.action-name', (event) => {
+    $(event.currentTarget).parents('.expandable').toggleClass('expanded');
+  });
+
+
   // handle sub-tab navigation on the actions tab
   html.find(".actions-nav").on("click", ".tab:not(.tab-active)", (event) => {
     const target = $(event.currentTarget);
@@ -239,6 +251,7 @@ function activateListeners() {
     e.setAttribute("style", `flex: 0 0 ${w}px`);
   });
 
+  // modifier tooltip
   html.find('.hover').tooltipster({
     animation: 'fade',
     delay: 200,
@@ -1040,6 +1053,77 @@ function preparedSpellSlots(spellcastingEntry, spellbook, actorData) {
       }
     }
   }
+}
+
+/* -------------------------------------------- */
+
+function onItemSummary(event, actorData) {
+  event.preventDefault();
+
+  const li = $(event.currentTarget).parent().parent();
+  const itemId = li.attr('data-item-id');
+  const itemType = li.attr('data-item-type');
+  let item;
+
+  if (itemType === 'spellSlot') return;
+
+  try {
+    item = actorData.items.find(item => item._id === itemId);
+    if (!item.type) return;
+  } catch (err) {
+    return;
+  }
+
+  if (item.data.type === 'spellcastingEntry' || item.data.type === 'condition')  return;
+
+  const chatData = getChatData(item, actorData, { secrets: actorData.owner });
+
+  renderItemSummary(li, chatData);
+}
+
+/* -------------------------------------------- */
+
+/**
+ * @param {JQuery} li
+ */
+function renderItemSummary(li, chatData) {
+  // Toggle summary
+  if (li.hasClass('expanded')) {
+    const summary = li.children('.item-summary');
+    summary.slideUp(200, () => summary.remove());
+  } else {
+    const div = $(`<div class="item-summary"><div class="item-description">${chatData.description.value}</div></div>`);
+    const props = $('<div class="item-properties tags"></div>');
+    if (chatData.properties) {
+      chatData.properties.filter((p) => typeof p === 'string').forEach((p) => {
+        props.append(`<span class="tag tag_secondary">${localize(p)}</span>`);
+      });
+    }
+    if (chatData.critSpecialization) props.append(`<span class="tag" title="${localize(chatData.critSpecialization.description)}" style="background: rgb(69,74,124); color: white;">${localize(chatData.critSpecialization.label)}</span>`);
+    // append traits (only style the tags if they contain description data)
+    if (chatData.traits && chatData.traits.length) {
+      chatData.traits.forEach((p) => {
+        if (p.description) props.append(`<span class="tag tag_alt" title="${localize(p.description)}">${localize(p.label)}</span>`);
+        else props.append(`<span class="tag">${localize(p.label)}</span>`);
+      });
+    }
+
+    div.append(props);
+    li.append(div.hide());
+    div.slideDown(200);
+  }
+  li.toggleClass('expanded');
+}
+
+/* -------------------------------------------- */
+
+function getChatData(item, actorData, htmlOptions) {
+  const itemType = item.type;
+  const data = ChatData[`${itemType}ChatData`](item, actorData)
+  if (data) {
+    data.description.value = TextEditor.enrichHTML(data.description.value, htmlOptions);
+  }
+  return data;
 }
 
 /* -------------------------------------------- */
