@@ -42,7 +42,7 @@ export const ChatData = {
     let twohandedTrait = false;
     const twohandedRegex = '(\\btwo-hand\\b)-(d\\d+)';
 
-    if (this.data.type !== 'weapon') {
+    if (item.type !== 'weapon') {
       throw new Error('tried to create a weapon chat data for a non-weapon item');
     }
 
@@ -63,7 +63,7 @@ export const ChatData = {
 
     // calculate attackRoll modifier (for _onItemSummary)
     const isFinesse = (data.traits.value || []).includes('finesse');
-    const abl = (isFinesse && actorData.data.abilities.dex.mod > actorData.data.abilities.str.mod ? 'dex' : (data.ability.value || 'str'));
+    const abl = (isFinesse && actorData.abilities.dex.mod > actorData.abilities.str.mod ? 'dex' : (data.ability.value || 'str'));
 
     const prof = data.weaponType.value || 'simple';
     // if a default martial proficiency then lookup the martial value, else find the martialSkill item and get the value from there.
@@ -73,21 +73,21 @@ export const ChatData = {
     };
     if (Object.keys(PF2E.weaponTypes).includes(prof)) {
       proficiency.type = "martial";
-      proficiency.value = (actorData.data).martial?.[prof]?.value || 0;
+      proficiency.value = actorData.martial?.[prof]?.value || 0;
     } else {
       try {
         const martialSkill = actorData.items.find(item => item._id === prof);
-        if (martialSkill.data.type === 'martial') {
+        if (martialSkill.type === 'martial') {
           proficiency.type = "skill";
-          const rank = martialSkill.data.data.proficient?.value || 0;
-          proficiency.value = ProficiencyModifier.fromLevelAndRank(this.actor.data.data.details.level.value, rank).modifier;
+          const rank = martialSkill.data.proficient?.value || 0;
+          proficiency.value = ProficiencyModifier.fromLevelAndRank(actorData.details.level.value, rank).modifier;
         }
       } catch (err) {
         console.log(`PF2E | Could not find martial skill for ${prof}`)
       }
     }
     data.proficiency = proficiency
-    data.attackRoll = getAttackBonus(data) + (actorData.data.abilities?.[abl]?.mod ?? 0) + proficiency.value;
+    data.attackRoll = getAttackBonus(data) + (actorData.abilities?.[abl]?.mod ?? 0) + proficiency.value;
 
     const properties = [
       // (parseInt(data.range.value) > 0) ? `${data.range.value} feet` : null,
@@ -193,10 +193,10 @@ export const ChatData = {
 
     const spellcastingEntry = actorData.items.find(item => item._id === data.location.value);
 
-    if (spellcastingEntry === null || spellcastingEntry.data.type !== 'spellcastingEntry') return {};
+    if (spellcastingEntry === null || spellcastingEntry.type !== 'spellcastingEntry') return {};
 
-    const spellDC = spellcastingEntry.data.data.spelldc.dc;
-    const spellAttack = spellcastingEntry.data.data.spelldc.value;
+    const spellDC = spellcastingEntry.data.spelldc.dc;
+    const spellAttack = spellcastingEntry.data.spelldc.value;
 
     // Spell saving throw text and DC
     data.isSave = data.spellType.value === 'save';

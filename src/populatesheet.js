@@ -49,6 +49,7 @@ function populateSheet(sheetTemplate, actorData, baseUrl) {
     isNPC: data.actorData.data.type === "npc",
     hasStamina: data.actorData.flags?.externalactor?.hasStamina || false,
     totalTreasure: data.actorData.totalTreasure,
+    pfsFactions: PF2E.pfsFactions,
     owner: true,
     baseUrl: baseUrl,
   };

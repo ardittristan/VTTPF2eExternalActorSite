@@ -1164,7 +1164,7 @@ pf2eConf.weaponGroups = {
   sword: "Sword",
 };
 
-pf2eConf.weaponDescription = {
+pf2eConf.weaponDescriptions = {
   axe:
     "Critical Specialization Effect: Choose one creature adjacent to the initial target and within reach. If its AC is lower than your attack roll result for the critical hit, you deal damage to that creature equal to the result of the weapon damage die you rolled (including extra dice for its potency rune, if any). This amount isn’t doubled, and no bonuses or other additional dice apply to this damage.",
   bomb: "Critical Specialization Effect: Increase the radius of the bomb’s splash damage (if any) to 10 feet.",
@@ -1184,6 +1184,15 @@ pf2eConf.weaponDescription = {
   sling: "Critical Specialization Effect: The target must succeed at a Fortitude save against your class DC or be stunned 1.",
   spear: "Critical Specialization Effect: The weapon pierces the target, weakening its attacks. The target is clumsy 1 until the start of your next turn.",
   sword: "Critical Specialization Effect: The target is made off‑balance by your attack, becoming ﬂat‑footed until the start of your next turn.",
+};
+
+pf2eConf.pfsFactions = {
+  EA: "PF2E.PFS.Factions.EA",
+  GA: "PF2E.PFS.Factions.GA",
+  HH: "PF2E.PFS.Factions.HH",
+  RO: "PF2E.PFS.Factions.RO",
+  VS: "PF2E.PFS.Factions.VS",
+  VW: "PF2E.PFS.Factions.VW",
 };
 
 export default pf2eConf;
