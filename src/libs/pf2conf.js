@@ -434,4 +434,65 @@ pf2eConf.currencies = {
   sp: "Silver",
 };
 
+pf2eConf.spellLevels = {
+  0: "Cantrip",
+  1: "1st Level",
+  2: "2nd Level",
+  3: "3rd Level",
+  4: "4th Level",
+  5: "5th Level",
+  6: "6th Level",
+  7: "7th Level",
+  8: "8th Level",
+  9: "9th Level",
+  10: "10th Level",
+};
+
+pf2eConf.areaSizes = {
+  5: "5 Foot",
+  10: "10 Foot",
+  15: "15 Foot",
+  20: "20 Foot",
+  30: "30 Foot",
+  40: "40 Foot",
+  50: "50 Foot",
+  60: "60 Foot",
+  120: "120 Foot",
+};
+
+pf2eConf.areaTypes = {
+  burst: "Burst",
+  cone: "Cone",
+  emanation: "Emanation",
+  line: "Line",
+};
+
+pf2eConf.magicTraditions = {
+  arcane: "Arcane",
+  divine: "Divine",
+  focus: "Focus",
+  occult: "Occult",
+  primal: "Primal",
+  ritual: "Ritual",
+  scroll: "Scroll",
+  wand: "Wand",
+};
+
+pf2eConf.preparationType = {
+  innate: "Innate",
+  prepared: "Prepared",
+  spontaneous: "Spontaneous",
+};
+
+pf2eConf.spellSchools = {
+  abj: "Abjuration",
+  con: "Conjuration",
+  div: "Divination",
+  enc: "Enchantment",
+  evo: "Evocation",
+  ill: "Illusion",
+  nec: "Necromancy",
+  trs: "Transmutation",
+};
+
 export default pf2eConf;

@@ -401,61 +401,47 @@ function prepareItems(actorData) {
       inventory[i.type].items.push(i);
     }
 
-    // !!Spells
-    // else if (i.type === 'spell') {
-    //   let item;
-    //     try {
-    //       item = this.actor.getOwnedItem(i._id);
-    //       i.spellInfo = item.getSpellInfo();
-    //     } catch (err) {
-    //       console.log(`PF2e System | Character Sheet | Could not load item ${i.name}`)
-    //     }
-    //   tempSpellbook.push(i);
-    // }
+    // Spells
+    else if (i.type === 'spell') {
+      let item;
+        try {
+          item = actorData.items.find(item => item._id === i._id);
+          i.spellInfo = getSpellInfo(item, actorData);
+        } catch (err) {
+          console.log(`PF2e System | Character Sheet | Could not load item ${i.name}`)
+        }
+      tempSpellbook.push(i);
+    }
 
-    //!! Spellcasting Entries
-    // else if (i.type === 'spellcastingEntry') {
-    //   // collect list of entries to use later to match spells against.
-    //   spellcastingEntriesList.push(i._id);
+    // Spellcasting Entries
+    else if (i.type === 'spellcastingEntry') {
+      // collect list of entries to use later to match spells against.
+      spellcastingEntriesList.push(i._id);
 
-    //   const spellRank = (i.data.proficiency?.value || 0);
-    //   const spellProficiency = ProficiencyModifier.fromLevelAndRank(actorData.data.details.level.value, spellRank).modifier;
-    //   const spellAbl = i.data.ability.value || 'int';
-    //   const spellAttack = actorData.data.abilities[spellAbl].mod + spellProficiency + i.data.item.value;
-    //   if (i.data.spelldc.value !== spellAttack) {
-    //     const updatedItem = {
-    //       _id: i._id,
-    //       data: {
-    //         spelldc: {
-    //           value: spellAttack,
-    //           dc: spellAttack + 10,
-    //           mod: actorData.data.abilities[spellAbl].mod,
-    //         },
-    //       },
-    //     };
-    //     this.actor.updateEmbeddedEntity('OwnedItem', updatedItem);
-    //   }
-    //   i.data.spelldc.mod = actorData.data.abilities[spellAbl].mod;
-    //   i.data.spelldc.breakdown = `10 + ${spellAbl} modifier(${actorData.data.abilities[spellAbl].mod}) + proficiency(${spellProficiency}) + item bonus(${i.data.item.value})`;
+      const spellRank = (i.data.proficiency?.value || 0);
+      const spellProficiency = ProficiencyModifier.fromLevelAndRank(actorData.data.details.level.value, spellRank).modifier;
+      const spellAbl = i.data.ability.value || 'int';
+      i.data.spelldc.mod = actorData.data.abilities[spellAbl].mod;
+      i.data.spelldc.breakdown = `10 + ${spellAbl} modifier(${actorData.data.abilities[spellAbl].mod}) + proficiency(${spellProficiency}) + item bonus(${i.data.item.value})`;
 
-    //   i.data.spelldc.icon = this._getProficiencyIcon(i.data.proficiency.value);
-    //   i.data.spelldc.hover = CONFIG.PF2E.proficiencyLevels[i.data.proficiency.value];
-    //   i.data.tradition.title = CONFIG.PF2E.magicTraditions[i.data.tradition.value];
-    //   i.data.prepared.title = CONFIG.PF2E.preparationType[i.data.prepared.value];
-    //   // Check if prepared spellcasting type and set Boolean
-    //   if ((i.data.prepared || {}).value === 'prepared') i.data.prepared.preparedSpells = true;
-    //   else i.data.prepared.preparedSpells = false;
-    //   // Check if Ritual spellcasting tradition and set Boolean
-    //   if ((i.data.tradition || {}).value === 'ritual') i.data.tradition.ritual = true;
-    //   else i.data.tradition.ritual = false;
-    //   if ((i.data.tradition || {}).value === 'focus') {
-    //     i.data.tradition.focus = true;
-    //     if (i.data.focus === undefined) i.data.focus = { points: 1, pool: 1};
-    //     i.data.focus.icon = this._getFocusIcon(i.data.focus);
-    //   } else i.data.tradition.focus = false;
+      i.data.spelldc.icon = getProficiencyIcon(i.data.proficiency.value);
+      i.data.spelldc.hover = PF2E.proficiencyLevels[i.data.proficiency.value];
+      i.data.tradition.title = PF2E.magicTraditions[i.data.tradition.value];
+      i.data.prepared.title = PF2E.preparationType[i.data.prepared.value];
+      // Check if prepared spellcasting type and set Boolean
+      if ((i.data.prepared || {}).value === 'prepared') i.data.prepared.preparedSpells = true;
+      else i.data.prepared.preparedSpells = false;
+      // Check if Ritual spellcasting tradition and set Boolean
+      if ((i.data.tradition || {}).value === 'ritual') i.data.tradition.ritual = true;
+      else i.data.tradition.ritual = false;
+      if ((i.data.tradition || {}).value === 'focus') {
+        i.data.tradition.focus = true;
+        if (i.data.focus === undefined) i.data.focus = { points: 1, pool: 1};
+        i.data.focus.icon = getFocusIcon(i.data.focus);
+      } else i.data.tradition.focus = false;
 
-    //   spellcastingEntries.push(i);
-    // }
+      spellcastingEntries.push(i);
+    }
 
     // Feats
     else if (i.type === "feat") {
@@ -568,27 +554,27 @@ function prepareItems(actorData) {
   inventory.equipment.investedItemCount = investedCount; // Tracking invested items
 
   const embeddedEntityUpdate = [];
-  //! Iterate through all spells in the temp spellbook and check that they are assigned to a valid spellcasting entry. If not place in unassigned.
-  // for (const i of tempSpellbook) {
-  //   // check if the spell has a valid spellcasting entry assigned to the location value.
-  //   if (spellcastingEntriesList.includes(i.data.location.value)) {
-  //     const location = i.data.location.value;
-  //     spellbooks[location] = spellbooks[location] || {};
-  //     this._prepareSpell(actorData, spellbooks[location], i);
-  //   } else if (spellcastingEntriesList.length === 1) { // if not BUT their is only one spellcasting entry then assign the spell to this entry.
-  //     const location = spellcastingEntriesList[0];
-  //     spellbooks[location] = spellbooks[location] || {};
+  // Iterate through all spells in the temp spellbook and check that they are assigned to a valid spellcasting entry. If not place in unassigned.
+  for (const i of tempSpellbook) {
+    // check if the spell has a valid spellcasting entry assigned to the location value.
+    if (spellcastingEntriesList.includes(i.data.location.value)) {
+      const location = i.data.location.value;
+      spellbooks[location] = spellbooks[location] || {};
+      prepareSpell(actorData, spellbooks[location], i);
+    } else if (spellcastingEntriesList.length === 1) { // if not BUT their is only one spellcasting entry then assign the spell to this entry.
+      const location = spellcastingEntriesList[0];
+      spellbooks[location] = spellbooks[location] || {};
 
-  //     // Update spell to perminantly have the correct ID now
-  //     // console.log(`PF2e System | Prepare Actor Data | Updating location for ${i.name}`);
-  //     // this.actor.updateEmbeddedEntity("OwnedItem", { "_id": i._id, "data.location.value": spellcastingEntriesList[0]});
-  //     embeddedEntityUpdate.push({ _id: i._id, 'data.location.value': spellcastingEntriesList[0] });
+      // Update spell to perminantly have the correct ID now
+      // console.log(`PF2e System | Prepare Actor Data | Updating location for ${i.name}`);
+      // this.actor.updateEmbeddedEntity("OwnedItem", { "_id": i._id, "data.location.value": spellcastingEntriesList[0]});
+      embeddedEntityUpdate.push({ _id: i._id, 'data.location.value': spellcastingEntriesList[0] });
 
-  //     this._prepareSpell(actorData, spellbooks[location], i);
-  //   } else { // else throw it in the orphaned list.
-  //     this._prepareSpell(actorData, spellbooks.unassigned, i);
-  //   }
-  // }
+      prepareSpell(actorData, spellbooks[location], i);
+    } else { // else throw it in the orphaned list.
+      prepareSpell(actorData, spellbooks.unassigned, i);
+    }
+  }
 
   // assign mode to actions
   Object.values(actions)
@@ -614,13 +600,12 @@ function prepareItems(actorData) {
   actorData.lores = lores;
   actorData.martialSkills = martialSkills;
 
-  //!!
-  // for (const entry of spellcastingEntries) {
-  //   if (entry.data.prepared.preparedSpells && spellbooks[entry._id]) {
-  //     this._preparedSpellSlots(entry, spellbooks[entry._id]);
-  //   }
-  //   entry.spellbook = spellbooks[entry._id];
-  // }
+  for (const entry of spellcastingEntries) {
+    if (entry.data.prepared.preparedSpells && spellbooks[entry._id]) {
+      preparedSpellSlots(entry, spellbooks[entry._id], actorData);
+    }
+    entry.spellbook = spellbooks[entry._id];
+  }
 
   actorData.spellcastingEntries = spellcastingEntries;
 
@@ -834,6 +819,213 @@ function noCoins() {
     sp: 0,
     cp: 0,
   };
+}
+
+/* -------------------------------------------- */
+
+function getSpellInfo(item, actorData) {
+  const data = JSON.parse(JSON.stringify(item.data));
+
+  const spellcastingEntry = actorData.items.find(item => item._id === data.location.value);
+
+  if (spellcastingEntry === null || spellcastingEntry.data.type !== 'spellcastingEntry') return {};
+
+  const spellDC = spellcastingEntry.data.data.spelldc.dc;
+  const spellAttack = spellcastingEntry.data.data.spelldc.value;
+
+  // Spell saving throw text and DC
+  data.isSave = data.spellType.value === 'save';
+
+  if (data.isSave) {
+    data.save.dc = spellDC;
+  } else data.save.dc = spellAttack;
+  data.save.str = data.save.value ? PF2E.saves[data.save.value.toLowerCase()] : '';
+
+  // Spell attack labels
+  data.damageLabel = data.spellType.value === 'heal' ? localize('PF2E.SpellTypeHeal') : localize('PF2E.DamageLabel');
+  data.isAttack = data.spellType.value === 'attack';
+
+  // Combine properties
+  const props = [
+    PF2E.spellLevels[data.level.value],
+    `${localize('PF2E.SpellComponentsLabel')}: ${data.components.value}`,
+    data.range.value ? `${localize('PF2E.SpellRangeLabel')}: ${data.range.value}` : null,
+    data.target.value ? `${localize('PF2E.SpellTargetLabel')}: ${data.target.value}` : null,
+    data.area.value ? `${localize('PF2E.SpellAreaLabel')}: ${PF2E.areaSizes[data.area.value]} ${PF2E.areaTypes[data.area.areaType]}` : null,
+    data.areasize?.value ? `${localize('PF2E.SpellAreaLabel')}: ${data.areasize.value}` : null,
+    data.time.value ? `${localize('PF2E.SpellTimeLabel')}: ${data.time.value}` : null,
+    data.duration.value ? `${localize('PF2E.SpellDurationLabel')}: ${data.duration.value}` : null,
+  ];
+  data.spellLvl = {}.spellLvl;
+  if (data.level.value < parseInt(data.spellLvl, 10)) {
+    props.push(`Heightened: +${parseInt(data.spellLvl, 10) - data.level.value}`);
+  }
+  data.properties = props.filter((p) => p !== null);
+
+  const traits = [];
+  if ((data.traits.value || []).length !== 0) {
+    for (let i = 0; i < data.traits.value.length; i++) {
+      const traitsObject = {
+        label: data.traits.value[i].charAt(0).toUpperCase() + data.traits.value[i].substr(1),
+        description: CONFIG.PF2E.traitsDescriptions[data.traits.value[i]] || '',
+      };
+      traits.push(traitsObject);
+    }
+  }
+  data.traits = traits.filter((p) => p);
+  // Toggling this off for now
+  /*     data.area = data.area.value ? {
+    "label": `Area: ${CONFIG.PF2E.areaSizes[data.area.value]} ${CONFIG.PF2E.areaTypes[data.area.areaType]}`,
+    "areaType": data.area.areaType,
+    "size": data.area.value
+  } : null; */
+
+  return data;
+}
+
+/* -------------------------------------------- */
+
+function getFocusIcon(focus) {
+  const icons = {};
+  const usedPoint = '<i class="fas fa-dot-circle"></i>';
+  const unUsedPoint = '<i class="far fa-circle"></i>';
+
+  for (let i=0; i<=focus.pool; i++) { // creates focus.pool amount of icon options to be selected in the icons object
+    let iconHtml = '';
+    for (let iconColumn=1; iconColumn<=focus.pool; iconColumn++) { // creating focus.pool amount of icons
+      iconHtml += (iconColumn<=i) ? usedPoint : unUsedPoint;
+    }
+    icons[i] = iconHtml;
+  }
+
+  return icons[focus.points];
+}
+
+/* -------------------------------------------- */
+
+function prepareSpell(actorData, spellbook, spell) {
+  const spellLvl = (Number(spell.data.level.value) < 11) ? Number(spell.data.level.value) : 10;
+  let spellcastingEntry = null;
+
+  if ((spell.data.location || {}).value) {
+    spellcastingEntry = (actorData.items.find(item => item._id === spell.data.location.value) || {});
+  }
+
+  // if the spellcaster entry cannot be found (maybe it was deleted?)
+  if (!spellcastingEntry) {
+    console.log(`PF2e System | Prepare Spell | Spellcasting entry not found for spell ${spell.name}`);
+    return;
+  }
+
+  // This is needed only if we want to prepare the data model only for the levels that a spell is already prepared in setup spellbook levels for all of those to catch case where sheet only has spells of lower level prepared in higher level slot
+  const isNotLevelBasedSpellcasting = spellcastingEntry.data?.tradition?.value === "wand" ||
+    spellcastingEntry.data?.tradition?.value === "scroll" ||
+    spellcastingEntry.data?.tradition?.value === "ritual" ||
+    spellcastingEntry.data?.tradition?.value === "focus"
+
+  const spellsSlotsWhereThisIsPrepared = Object.entries(spellcastingEntry.data?.slots || {})?.filter( slotArr => !!Object.values(slotArr[1].prepared).find(slotSpell => slotSpell?.id === spell._id))
+  const highestSlotPrepared = spellsSlotsWhereThisIsPrepared?.map(slot => parseInt(slot[0].match(/slot(\d+)/)[1],10)).reduce( (acc,cur) => cur>acc ? cur : acc, 0) ?? spellLvl
+  const normalHighestSpellLevel = Math.ceil(actorData.data.details.level.value / 2)
+  const maxSpellLevelToShow = Math.min(10,Math.max(spellLvl, highestSlotPrepared, normalHighestSpellLevel))
+  // Extend the Spellbook level
+  for(let i=maxSpellLevelToShow;i>=0;i--){
+    if(!isNotLevelBasedSpellcasting || i === spellLvl){
+      spellbook[i] = spellbook[i] || {
+        isCantrip: i === 0,
+        isFocus: i === 11,
+        label: PF2E.spellLevels[i],
+        spells: [],
+        prepared: [],
+        uses: spellcastingEntry ? parseInt(spellcastingEntry.data?.slots[`slot${i}`].value, 10) || 0 : 0,
+        slots: spellcastingEntry ? parseInt(spellcastingEntry.data?.slots[`slot${i}`].max, 10) || 0 : 0,
+        displayPrepared: spellcastingEntry && spellcastingEntry.data.displayLevels && spellcastingEntry.data.displayLevels[i] !== undefined ? (spellcastingEntry.data.displayLevels[i]) : true,
+        unpreparedSpellsLabel: spellcastingEntry && spellcastingEntry.data.tradition.value==='arcane' && spellcastingEntry.data.prepared.value==='prepared' ? localize("PF2E.UnpreparedSpellsLabelArcanePrepared") : localize("PF2E.UnpreparedSpellsLabel")
+      };
+    }
+  }
+
+
+  // Add the spell to the spellbook at the appropriate level
+  spell.data.school.str = PF2E.spellSchools[spell.data.school.value];
+  // Add chat data
+  try {
+    const item = actorData.items.find(item => item._id === spell._id);
+    if (item){
+        spell.spellInfo = getSpellInfo(item, actorData);
+    }
+  } catch (err) {
+    console.log(`PF2e System | Character Sheet | Could not load chat data for spell ${spell.id}`, spell)
+  }
+  spellbook[spellLvl].spells.push(spell);
+}
+
+/* -------------------------------------------- */
+
+function preparedSpellSlots(spellcastingEntry, spellbook, actorData) {
+  // let isNPC = this.actorType === "npc";
+
+  for (const [key, spl] of Object.entries(spellbook)) {
+    if (spl.slots > 0) {
+      for (let i = 0; i < spl.slots; i++) {
+        const entrySlot = ((spellcastingEntry.data.slots[`slot${key}`] || {}).prepared || {})[i] || null;
+
+        if (entrySlot && entrySlot.id) {
+          // console.log(`PF2e System | Getting item: ${entrySlot.id}: `);
+          const item = actorData.items.find(item => item._id === entrySlot.id);
+          if (item) {
+            // console.log(`PF2e System | Duplicating item: ${item.name}: `, item);
+            const itemCopy = JSON.parse(JSON.stringify(item));
+            if (entrySlot.expended) {
+              itemCopy.expended = true;
+            }
+            else {
+              itemCopy.expended = false;
+            }
+
+            spl.prepared[i] = itemCopy;
+            if (spl.prepared[i]) {
+              // enrich data with spell school formatted string
+              if (spl.prepared[i].data && spl.prepared[i].data.school && spl.prepared[i].data.school.str) {
+                spl.prepared[i].data.school.str = CONFIG.PF2E.spellSchools[spl.prepared[i].data.school.value];
+              }
+
+              // Add chat data
+              try {
+                  spl.prepared[i].spellInfo = getSpellInfo(item, actorData);
+              } catch (err) {
+                console.log(`PF2e System | Character Sheet | Could not load prepared spell ${entrySlot.id}`, item)
+              }
+
+
+              spl.prepared[i].prepared = true;
+            }
+            // prepared spell not found
+            else {
+              spl.prepared[i] = {
+                name: 'Empty Slot (drag spell here)',
+                id: null,
+                prepared: false,
+              };
+            }
+          } else {
+            // Could not find an item for ID: ${entrySlot.id}. Marking the slot as empty so it can be overwritten.
+            spl.prepared[i] = {
+              name: 'Empty Slot (drag spell here)',
+              id: null,
+              prepared: false,
+            };
+          }
+        } else {
+          // if there is no prepared spell for this slot then make it empty.
+          spl.prepared[i] = {
+            name: 'Empty Slot (drag spell here)',
+            id: null,
+            prepared: false,
+          };
+        }
+      }
+    }
+  }
 }
 
 /* -------------------------------------------- */
