@@ -4,7 +4,7 @@ import { ProficiencyModifier } from "./libs/modifiers";
 import { ConditionManager } from "./libs/conditions";
 import TextEditor from "./libs/TextEditor";
 import { getContainerMap } from "./libs/container";
-import {indexBulkItemsById, itemsFromActorData, stacks, calculateBulk, formatBulk} from "./libs/bulk"
+import {indexBulkItemsById, itemsFromActorData, stacks, calculateBulk, formatBulk, defaultBulkConfig} from "./libs/bulk"
 import {calculateEncumbrance} from "./libs/encumbrance"
 
 TextEditor._decoder = document.createElement("textarea");
@@ -354,14 +354,14 @@ function prepareItems(actorData) {
   const martialSkills = [];
 
   // Iterate through items, allocating to containers
-  // const bulkConfig = {
-  //   ignoreCoinBulk: game.settings.get("pf2e", "ignoreCoinBulk"),
-  //   ignoreContainerOverflow: game.settings.get("pf2e", "ignoreContainerOverflow"),
-  // };
+  const bulkConfig = {
+    ignoreCoinBulk: actorData.flags?.externalactor?.ignoreCoinBulk || defaultBulkConfig.ignoreCoinBulk,
+    ignoreContainerOverflow: actorData.flags?.externalactor?.ignoreContainerOverflow || defaultBulkConfig.ignoreContainerOverflow,
+  };
 
   const bulkItems = itemsFromActorData(actorData);
   const indexedBulkItems = indexBulkItemsById(bulkItems);
-  const containers = getContainerMap(actorData.items, indexedBulkItems, stacks, /* bulkConfig */);
+  const containers = getContainerMap(actorData.items, indexedBulkItems, stacks, bulkConfig);
 
   let investedCount = 0; // Tracking invested items
 
@@ -390,7 +390,7 @@ function prepareItems(actorData) {
     if (Object.keys(inventory).includes(i.type)) {
       i.data.quantity.value = i.data.quantity.value || 0;
       i.data.weight.value = i.data.weight.value || 0;
-      const [approximatedBulk] = calculateBulk([indexedBulkItems.get(i._id)], stacks, false, /* bulkConfig */);
+      const [approximatedBulk] = calculateBulk([indexedBulkItems.get(i._id)], stacks, false, bulkConfig);
       i.totalWeight = formatBulk(approximatedBulk);
       i.hasCharges = i.type === "consumable" && i.data.charges.max > 0;
       i.isTwoHanded = i.type === "weapon" && !!(i.data.traits.value || []).find((x) => x.startsWith("two-hand"));
@@ -668,7 +668,7 @@ function prepareItems(actorData) {
     bonusEncumbranceBulk += 1;
     bonusLimitBulk += 1;
   }
-  const [bulk] = calculateBulk(bulkItems, stacks, false, /* bulkConfig */);
+  const [bulk] = calculateBulk(bulkItems, stacks, false, bulkConfig);
   actorData.data.attributes.encumbrance = calculateEncumbrance(
     actorData.data.abilities.str.mod,
     bonusEncumbranceBulk,
