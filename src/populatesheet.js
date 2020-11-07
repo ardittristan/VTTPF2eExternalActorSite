@@ -238,6 +238,20 @@ function activateListeners() {
     const w = (text.length * parseInt(e.getAttribute("data-wpad"), 10)) / 2;
     e.setAttribute("style", `flex: 0 0 ${w}px`);
   });
+
+  html.find('.hover').tooltipster({
+    animation: 'fade',
+    delay: 200,
+    trigger: 'click',
+    arrow: false,
+    contentAsHTML: true,
+    debug: true,
+    interactive: true,
+    side: ['right', 'bottom'],
+    theme: 'crb-hover',
+    minWidth: 120,
+});
+
 }
 
 /* -------------------------------------------- */
