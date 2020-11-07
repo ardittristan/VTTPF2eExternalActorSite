@@ -1,6 +1,10 @@
 import Tabs from "./libs/tabs.js";
 import localize from "./handlebars/helpers/stringify";
 import { ProficiencyModifier } from "./libs/modifiers";
+import { ConditionManager } from "./libs/conditions";
+import TextEditor from "./libs/TextEditor"
+
+TextEditor._decoder = document.createElement('textarea')
 
 /**
  * might be different for different systems, but this initializes the sheet tabs
@@ -128,6 +132,11 @@ function getData(actorData, baseUrl) {
 
   // traits
   prepareTraits(actorData.data.traits);
+
+  actorData.data.effects = {};
+
+  actorData.data.effects.conditions = ConditionManager.getFlattenedConditions(actorData.items.filter(i => i.flags.pf2e?.condition && i.type === 'condition'));
+
 
   return {
     actorData,

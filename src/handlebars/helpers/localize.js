@@ -1,3 +1,3 @@
-import stringify from "./stringify"
+const stringify = require("./stringify");
 
-module.exports = stringify
+module.exports = stringify;
