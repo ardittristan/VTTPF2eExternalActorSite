@@ -4,9 +4,9 @@ import { ProficiencyModifier } from "./libs/modifiers";
 import { ConditionManager } from "./libs/conditions";
 import TextEditor from "./libs/TextEditor";
 import { getContainerMap } from "./libs/container";
-import {indexBulkItemsById, itemsFromActorData, stacks, calculateBulk, formatBulk, defaultBulkConfig} from "./libs/bulk"
-import {calculateEncumbrance} from "./libs/encumbrance"
-import {ChatData} from "./libs/ChatData"
+import { indexBulkItemsById, itemsFromActorData, stacks, calculateBulk, formatBulk, defaultBulkConfig } from "./libs/bulk";
+import { calculateEncumbrance } from "./libs/encumbrance";
+import { ChatData } from "./libs/ChatData";
 
 TextEditor._decoder = document.createElement("textarea");
 
@@ -62,7 +62,7 @@ function populateSheet(sheetTemplate, actorData, baseUrl) {
       isEncumbered: true,
       isOverLimit: true,
       limitPercentageMax100: true,
-      bulk: true
+      bulk: true,
     },
   });
 
@@ -219,15 +219,14 @@ function activateListeners(actorData) {
   });
 
   // item summary
-  html.find('.item .item-name h4').click((event) => {
+  html.find(".item .item-name h4").click((event) => {
     onItemSummary(event, actorData);
   });
 
   // strike summary
-  html.find('.strikes-list [data-action-index]').on('click', '.action-name', (event) => {
-    $(event.currentTarget).parents('.expandable').toggleClass('expanded');
+  html.find(".strikes-list [data-action-index]").on("click", ".action-name", (event) => {
+    $(event.currentTarget).parents(".expandable").toggleClass("expanded");
   });
-
 
   // handle sub-tab navigation on the actions tab
   html.find(".actions-nav").on("click", ".tab:not(.tab-active)", (event) => {
@@ -252,19 +251,18 @@ function activateListeners(actorData) {
   });
 
   // modifier tooltip
-  html.find('.hover').tooltipster({
-    animation: 'fade',
+  html.find(".hover").tooltipster({
+    animation: "fade",
     delay: 200,
-    trigger: 'click',
+    trigger: "click",
     arrow: false,
     contentAsHTML: true,
     debug: true,
     interactive: true,
-    side: ['right', 'bottom'],
-    theme: 'crb-hover',
+    side: ["right", "bottom"],
+    theme: "crb-hover",
     minWidth: 120,
-});
-
+  });
 }
 
 /* -------------------------------------------- */
@@ -429,25 +427,25 @@ function prepareItems(actorData) {
     }
 
     // Spells
-    else if (i.type === 'spell') {
+    else if (i.type === "spell") {
       let item;
-        try {
-          item = actorData.items.find(item => item._id === i._id);
-          i.spellInfo = getSpellInfo(item, actorData);
-        } catch (err) {
-          console.log(`PF2e System | Character Sheet | Could not load item ${i.name}`)
-        }
+      try {
+        item = actorData.items.find((item) => item._id === i._id);
+        i.spellInfo = getSpellInfo(item, actorData);
+      } catch (err) {
+        console.log(`PF2e System | Character Sheet | Could not load item ${i.name}`);
+      }
       tempSpellbook.push(i);
     }
 
     // Spellcasting Entries
-    else if (i.type === 'spellcastingEntry') {
+    else if (i.type === "spellcastingEntry") {
       // collect list of entries to use later to match spells against.
       spellcastingEntriesList.push(i._id);
 
-      const spellRank = (i.data.proficiency?.value || 0);
+      const spellRank = i.data.proficiency?.value || 0;
       const spellProficiency = ProficiencyModifier.fromLevelAndRank(actorData.data.details.level.value, spellRank).modifier;
-      const spellAbl = i.data.ability.value || 'int';
+      const spellAbl = i.data.ability.value || "int";
       i.data.spelldc.mod = actorData.data.abilities[spellAbl].mod;
       i.data.spelldc.breakdown = `10 + ${spellAbl} modifier(${actorData.data.abilities[spellAbl].mod}) + proficiency(${spellProficiency}) + item bonus(${i.data.item.value})`;
 
@@ -456,14 +454,14 @@ function prepareItems(actorData) {
       i.data.tradition.title = PF2E.magicTraditions[i.data.tradition.value];
       i.data.prepared.title = PF2E.preparationType[i.data.prepared.value];
       // Check if prepared spellcasting type and set Boolean
-      if ((i.data.prepared || {}).value === 'prepared') i.data.prepared.preparedSpells = true;
+      if ((i.data.prepared || {}).value === "prepared") i.data.prepared.preparedSpells = true;
       else i.data.prepared.preparedSpells = false;
       // Check if Ritual spellcasting tradition and set Boolean
-      if ((i.data.tradition || {}).value === 'ritual') i.data.tradition.ritual = true;
+      if ((i.data.tradition || {}).value === "ritual") i.data.tradition.ritual = true;
       else i.data.tradition.ritual = false;
-      if ((i.data.tradition || {}).value === 'focus') {
+      if ((i.data.tradition || {}).value === "focus") {
         i.data.tradition.focus = true;
-        if (i.data.focus === undefined) i.data.focus = { points: 1, pool: 1};
+        if (i.data.focus === undefined) i.data.focus = { points: 1, pool: 1 };
         i.data.focus.icon = getFocusIcon(i.data.focus);
       } else i.data.tradition.focus = false;
 
@@ -588,17 +586,19 @@ function prepareItems(actorData) {
       const location = i.data.location.value;
       spellbooks[location] = spellbooks[location] || {};
       prepareSpell(actorData, spellbooks[location], i);
-    } else if (spellcastingEntriesList.length === 1) { // if not BUT their is only one spellcasting entry then assign the spell to this entry.
+    } else if (spellcastingEntriesList.length === 1) {
+      // if not BUT their is only one spellcasting entry then assign the spell to this entry.
       const location = spellcastingEntriesList[0];
       spellbooks[location] = spellbooks[location] || {};
 
       // Update spell to perminantly have the correct ID now
       // console.log(`PF2e System | Prepare Actor Data | Updating location for ${i.name}`);
       // this.actor.updateEmbeddedEntity("OwnedItem", { "_id": i._id, "data.location.value": spellcastingEntriesList[0]});
-      embeddedEntityUpdate.push({ _id: i._id, 'data.location.value': spellcastingEntriesList[0] });
+      embeddedEntityUpdate.push({ _id: i._id, "data.location.value": spellcastingEntriesList[0] });
 
       prepareSpell(actorData, spellbooks[location], i);
-    } else { // else throw it in the orphaned list.
+    } else {
+      // else throw it in the orphaned list.
       prepareSpell(actorData, spellbooks.unassigned, i);
     }
   }
@@ -664,18 +664,15 @@ function prepareItems(actorData) {
 
   // Inventory encumbrance
   // FIXME: this is hard coded for now
-  const featNames = new Set(actorData.items
-    .filter(item => item.type === 'feat')
-    .map(item => item.name));
+  const featNames = new Set(actorData.items.filter((item) => item.type === "feat").map((item) => item.name));
 
   let bonusEncumbranceBulk = actorData.data.attributes.bonusEncumbranceBulk ?? 0;
   let bonusLimitBulk = actorData.data.attributes.bonusLimitBulk ?? 0;
-  if (featNames.has('Hefty Hauler')) {
+  if (featNames.has("Hefty Hauler")) {
     bonusEncumbranceBulk += 2;
     bonusLimitBulk += 2;
   }
-  const equippedLiftingBelt = actorData.items
-    .find(item => item.name === 'Lifting Belt' && item.data.equipped.value) !== undefined;
+  const equippedLiftingBelt = actorData.items.find((item) => item.name === "Lifting Belt" && item.data.equipped.value) !== undefined;
   if (equippedLiftingBelt) {
     bonusEncumbranceBulk += 1;
     bonusLimitBulk += 1;
@@ -686,7 +683,7 @@ function prepareItems(actorData) {
     bonusEncumbranceBulk,
     bonusLimitBulk,
     bulk,
-    actorData.data?.traits?.size?.value ?? 'Medium',
+    actorData.data?.traits?.size?.value ?? "Medium"
   );
 }
 
@@ -853,35 +850,35 @@ function noCoins() {
 function getSpellInfo(item, actorData) {
   const data = JSON.parse(JSON.stringify(item.data));
 
-  const spellcastingEntry = actorData.items.find(item => item._id === data.location.value);
+  const spellcastingEntry = actorData.items.find((item) => item._id === data.location.value);
 
-  if (spellcastingEntry === null || spellcastingEntry.data.type !== 'spellcastingEntry') return {};
+  if (spellcastingEntry === null || spellcastingEntry.data.type !== "spellcastingEntry") return {};
 
   const spellDC = spellcastingEntry.data.data.spelldc.dc;
   const spellAttack = spellcastingEntry.data.data.spelldc.value;
 
   // Spell saving throw text and DC
-  data.isSave = data.spellType.value === 'save';
+  data.isSave = data.spellType.value === "save";
 
   if (data.isSave) {
     data.save.dc = spellDC;
   } else data.save.dc = spellAttack;
-  data.save.str = data.save.value ? PF2E.saves[data.save.value.toLowerCase()] : '';
+  data.save.str = data.save.value ? PF2E.saves[data.save.value.toLowerCase()] : "";
 
   // Spell attack labels
-  data.damageLabel = data.spellType.value === 'heal' ? localize('PF2E.SpellTypeHeal') : localize('PF2E.DamageLabel');
-  data.isAttack = data.spellType.value === 'attack';
+  data.damageLabel = data.spellType.value === "heal" ? localize("PF2E.SpellTypeHeal") : localize("PF2E.DamageLabel");
+  data.isAttack = data.spellType.value === "attack";
 
   // Combine properties
   const props = [
     PF2E.spellLevels[data.level.value],
-    `${localize('PF2E.SpellComponentsLabel')}: ${data.components.value}`,
-    data.range.value ? `${localize('PF2E.SpellRangeLabel')}: ${data.range.value}` : null,
-    data.target.value ? `${localize('PF2E.SpellTargetLabel')}: ${data.target.value}` : null,
-    data.area.value ? `${localize('PF2E.SpellAreaLabel')}: ${PF2E.areaSizes[data.area.value]} ${PF2E.areaTypes[data.area.areaType]}` : null,
-    data.areasize?.value ? `${localize('PF2E.SpellAreaLabel')}: ${data.areasize.value}` : null,
-    data.time.value ? `${localize('PF2E.SpellTimeLabel')}: ${data.time.value}` : null,
-    data.duration.value ? `${localize('PF2E.SpellDurationLabel')}: ${data.duration.value}` : null,
+    `${localize("PF2E.SpellComponentsLabel")}: ${data.components.value}`,
+    data.range.value ? `${localize("PF2E.SpellRangeLabel")}: ${data.range.value}` : null,
+    data.target.value ? `${localize("PF2E.SpellTargetLabel")}: ${data.target.value}` : null,
+    data.area.value ? `${localize("PF2E.SpellAreaLabel")}: ${PF2E.areaSizes[data.area.value]} ${PF2E.areaTypes[data.area.areaType]}` : null,
+    data.areasize?.value ? `${localize("PF2E.SpellAreaLabel")}: ${data.areasize.value}` : null,
+    data.time.value ? `${localize("PF2E.SpellTimeLabel")}: ${data.time.value}` : null,
+    data.duration.value ? `${localize("PF2E.SpellDurationLabel")}: ${data.duration.value}` : null,
   ];
   data.spellLvl = {}.spellLvl;
   if (data.level.value < parseInt(data.spellLvl, 10)) {
@@ -894,7 +891,7 @@ function getSpellInfo(item, actorData) {
     for (let i = 0; i < data.traits.value.length; i++) {
       const traitsObject = {
         label: data.traits.value[i].charAt(0).toUpperCase() + data.traits.value[i].substr(1),
-        description: CONFIG.PF2E.traitsDescriptions[data.traits.value[i]] || '',
+        description: CONFIG.PF2E.traitsDescriptions[data.traits.value[i]] || "",
       };
       traits.push(traitsObject);
     }
@@ -917,10 +914,12 @@ function getFocusIcon(focus) {
   const usedPoint = '<i class="fas fa-dot-circle"></i>';
   const unUsedPoint = '<i class="far fa-circle"></i>';
 
-  for (let i=0; i<=focus.pool; i++) { // creates focus.pool amount of icon options to be selected in the icons object
-    let iconHtml = '';
-    for (let iconColumn=1; iconColumn<=focus.pool; iconColumn++) { // creating focus.pool amount of icons
-      iconHtml += (iconColumn<=i) ? usedPoint : unUsedPoint;
+  for (let i = 0; i <= focus.pool; i++) {
+    // creates focus.pool amount of icon options to be selected in the icons object
+    let iconHtml = "";
+    for (let iconColumn = 1; iconColumn <= focus.pool; iconColumn++) {
+      // creating focus.pool amount of icons
+      iconHtml += iconColumn <= i ? usedPoint : unUsedPoint;
     }
     icons[i] = iconHtml;
   }
@@ -931,11 +930,11 @@ function getFocusIcon(focus) {
 /* -------------------------------------------- */
 
 function prepareSpell(actorData, spellbook, spell) {
-  const spellLvl = (Number(spell.data.level.value) < 11) ? Number(spell.data.level.value) : 10;
+  const spellLvl = Number(spell.data.level.value) < 11 ? Number(spell.data.level.value) : 10;
   let spellcastingEntry = null;
 
   if ((spell.data.location || {}).value) {
-    spellcastingEntry = (actorData.items.find(item => item._id === spell.data.location.value) || {});
+    spellcastingEntry = actorData.items.find((item) => item._id === spell.data.location.value) || {};
   }
 
   // if the spellcaster entry cannot be found (maybe it was deleted?)
@@ -945,18 +944,22 @@ function prepareSpell(actorData, spellbook, spell) {
   }
 
   // This is needed only if we want to prepare the data model only for the levels that a spell is already prepared in setup spellbook levels for all of those to catch case where sheet only has spells of lower level prepared in higher level slot
-  const isNotLevelBasedSpellcasting = spellcastingEntry.data?.tradition?.value === "wand" ||
+  const isNotLevelBasedSpellcasting =
+    spellcastingEntry.data?.tradition?.value === "wand" ||
     spellcastingEntry.data?.tradition?.value === "scroll" ||
     spellcastingEntry.data?.tradition?.value === "ritual" ||
-    spellcastingEntry.data?.tradition?.value === "focus"
+    spellcastingEntry.data?.tradition?.value === "focus";
 
-  const spellsSlotsWhereThisIsPrepared = Object.entries(spellcastingEntry.data?.slots || {})?.filter( slotArr => !!Object.values(slotArr[1].prepared).find(slotSpell => slotSpell?.id === spell._id))
-  const highestSlotPrepared = spellsSlotsWhereThisIsPrepared?.map(slot => parseInt(slot[0].match(/slot(\d+)/)[1],10)).reduce( (acc,cur) => cur>acc ? cur : acc, 0) ?? spellLvl
-  const normalHighestSpellLevel = Math.ceil(actorData.data.details.level.value / 2)
-  const maxSpellLevelToShow = Math.min(10,Math.max(spellLvl, highestSlotPrepared, normalHighestSpellLevel))
+  const spellsSlotsWhereThisIsPrepared = Object.entries(spellcastingEntry.data?.slots || {})?.filter(
+    (slotArr) => !!Object.values(slotArr[1].prepared).find((slotSpell) => slotSpell?.id === spell._id)
+  );
+  const highestSlotPrepared =
+    spellsSlotsWhereThisIsPrepared?.map((slot) => parseInt(slot[0].match(/slot(\d+)/)[1], 10)).reduce((acc, cur) => (cur > acc ? cur : acc), 0) ?? spellLvl;
+  const normalHighestSpellLevel = Math.ceil(actorData.data.details.level.value / 2);
+  const maxSpellLevelToShow = Math.min(10, Math.max(spellLvl, highestSlotPrepared, normalHighestSpellLevel));
   // Extend the Spellbook level
-  for(let i=maxSpellLevelToShow;i>=0;i--){
-    if(!isNotLevelBasedSpellcasting || i === spellLvl){
+  for (let i = maxSpellLevelToShow; i >= 0; i--) {
+    if (!isNotLevelBasedSpellcasting || i === spellLvl) {
       spellbook[i] = spellbook[i] || {
         isCantrip: i === 0,
         isFocus: i === 11,
@@ -965,23 +968,28 @@ function prepareSpell(actorData, spellbook, spell) {
         prepared: [],
         uses: spellcastingEntry ? parseInt(spellcastingEntry.data?.slots[`slot${i}`].value, 10) || 0 : 0,
         slots: spellcastingEntry ? parseInt(spellcastingEntry.data?.slots[`slot${i}`].max, 10) || 0 : 0,
-        displayPrepared: spellcastingEntry && spellcastingEntry.data.displayLevels && spellcastingEntry.data.displayLevels[i] !== undefined ? (spellcastingEntry.data.displayLevels[i]) : true,
-        unpreparedSpellsLabel: spellcastingEntry && spellcastingEntry.data.tradition.value==='arcane' && spellcastingEntry.data.prepared.value==='prepared' ? localize("PF2E.UnpreparedSpellsLabelArcanePrepared") : localize("PF2E.UnpreparedSpellsLabel")
+        displayPrepared:
+          spellcastingEntry && spellcastingEntry.data.displayLevels && spellcastingEntry.data.displayLevels[i] !== undefined
+            ? spellcastingEntry.data.displayLevels[i]
+            : true,
+        unpreparedSpellsLabel:
+          spellcastingEntry && spellcastingEntry.data.tradition.value === "arcane" && spellcastingEntry.data.prepared.value === "prepared"
+            ? localize("PF2E.UnpreparedSpellsLabelArcanePrepared")
+            : localize("PF2E.UnpreparedSpellsLabel"),
       };
     }
   }
-
 
   // Add the spell to the spellbook at the appropriate level
   spell.data.school.str = PF2E.spellSchools[spell.data.school.value];
   // Add chat data
   try {
-    const item = actorData.items.find(item => item._id === spell._id);
-    if (item){
-        spell.spellInfo = getSpellInfo(item, actorData);
+    const item = actorData.items.find((item) => item._id === spell._id);
+    if (item) {
+      spell.spellInfo = getSpellInfo(item, actorData);
     }
   } catch (err) {
-    console.log(`PF2e System | Character Sheet | Could not load chat data for spell ${spell.id}`, spell)
+    console.log(`PF2e System | Character Sheet | Could not load chat data for spell ${spell.id}`, spell);
   }
   spellbook[spellLvl].spells.push(spell);
 }
@@ -998,14 +1006,13 @@ function preparedSpellSlots(spellcastingEntry, spellbook, actorData) {
 
         if (entrySlot && entrySlot.id) {
           // console.log(`PF2e System | Getting item: ${entrySlot.id}: `);
-          const item = actorData.items.find(item => item._id === entrySlot.id);
+          const item = actorData.items.find((item) => item._id === entrySlot.id);
           if (item) {
             // console.log(`PF2e System | Duplicating item: ${item.name}: `, item);
             const itemCopy = JSON.parse(JSON.stringify(item));
             if (entrySlot.expended) {
               itemCopy.expended = true;
-            }
-            else {
+            } else {
               itemCopy.expended = false;
             }
 
@@ -1018,18 +1025,17 @@ function preparedSpellSlots(spellcastingEntry, spellbook, actorData) {
 
               // Add chat data
               try {
-                  spl.prepared[i].spellInfo = getSpellInfo(item, actorData);
+                spl.prepared[i].spellInfo = getSpellInfo(item, actorData);
               } catch (err) {
-                console.log(`PF2e System | Character Sheet | Could not load prepared spell ${entrySlot.id}`, item)
+                console.log(`PF2e System | Character Sheet | Could not load prepared spell ${entrySlot.id}`, item);
               }
-
 
               spl.prepared[i].prepared = true;
             }
             // prepared spell not found
             else {
               spl.prepared[i] = {
-                name: 'Empty Slot (drag spell here)',
+                name: "Empty Slot (drag spell here)",
                 id: null,
                 prepared: false,
               };
@@ -1037,7 +1043,7 @@ function preparedSpellSlots(spellcastingEntry, spellbook, actorData) {
           } else {
             // Could not find an item for ID: ${entrySlot.id}. Marking the slot as empty so it can be overwritten.
             spl.prepared[i] = {
-              name: 'Empty Slot (drag spell here)',
+              name: "Empty Slot (drag spell here)",
               id: null,
               prepared: false,
             };
@@ -1045,7 +1051,7 @@ function preparedSpellSlots(spellcastingEntry, spellbook, actorData) {
         } else {
           // if there is no prepared spell for this slot then make it empty.
           spl.prepared[i] = {
-            name: 'Empty Slot (drag spell here)',
+            name: "Empty Slot (drag spell here)",
             id: null,
             prepared: false,
           };
@@ -1061,20 +1067,20 @@ function onItemSummary(event, actorData) {
   event.preventDefault();
 
   const li = $(event.currentTarget).parent().parent();
-  const itemId = li.attr('data-item-id');
-  const itemType = li.attr('data-item-type');
+  const itemId = li.attr("data-item-id");
+  const itemType = li.attr("data-item-type");
   let item;
 
-  if (itemType === 'spellSlot') return;
+  if (itemType === "spellSlot") return;
 
   try {
-    item = actorData.items.find(item => item._id === itemId);
+    item = actorData.items.find((item) => item._id === itemId);
     if (!item.type) return;
   } catch (err) {
     return;
   }
 
-  if (item.data.type === 'spellcastingEntry' || item.data.type === 'condition')  return;
+  if (item.data.type === "spellcastingEntry" || item.data.type === "condition") return;
 
   const chatData = getChatData(item, actorData, { secrets: actorData.owner });
 
@@ -1088,18 +1094,25 @@ function onItemSummary(event, actorData) {
  */
 function renderItemSummary(li, chatData) {
   // Toggle summary
-  if (li.hasClass('expanded')) {
-    const summary = li.children('.item-summary');
+  if (li.hasClass("expanded")) {
+    const summary = li.children(".item-summary");
     summary.slideUp(200, () => summary.remove());
   } else {
     const div = $(`<div class="item-summary"><div class="item-description">${chatData.description.value}</div></div>`);
     const props = $('<div class="item-properties tags"></div>');
     if (chatData.properties) {
-      chatData.properties.filter((p) => typeof p === 'string').forEach((p) => {
-        props.append(`<span class="tag tag_secondary">${localize(p)}</span>`);
-      });
+      chatData.properties
+        .filter((p) => typeof p === "string")
+        .forEach((p) => {
+          props.append(`<span class="tag tag_secondary">${localize(p)}</span>`);
+        });
     }
-    if (chatData.critSpecialization) props.append(`<span class="tag" title="${localize(chatData.critSpecialization.description)}" style="background: rgb(69,74,124); color: white;">${localize(chatData.critSpecialization.label)}</span>`);
+    if (chatData.critSpecialization)
+      props.append(
+        `<span class="tag" title="${localize(chatData.critSpecialization.description)}" style="background: rgb(69,74,124); color: white;">${localize(
+          chatData.critSpecialization.label
+        )}</span>`
+      );
     // append traits (only style the tags if they contain description data)
     if (chatData.traits && chatData.traits.length) {
       chatData.traits.forEach((p) => {
@@ -1112,14 +1125,14 @@ function renderItemSummary(li, chatData) {
     li.append(div.hide());
     div.slideDown(200);
   }
-  li.toggleClass('expanded');
+  li.toggleClass("expanded");
 }
 
 /* -------------------------------------------- */
 
 function getChatData(item, actorData, htmlOptions) {
   const itemType = item.type;
-  const data = ChatData[`${itemType}ChatData`](item, actorData)
+  const data = ChatData[`${itemType}ChatData`](item, actorData);
   if (data) {
     data.description.value = TextEditor.enrichHTML(data.description.value, htmlOptions);
   }
