@@ -1002,7 +1002,7 @@ function onItemSummary(event, actorData) {
     return;
   }
 
-  if (item.data.type === "spellcastingEntry" || item.data.type === "condition") return;
+  if (item.type === "spellcastingEntry" || item.type === "condition") return;
 
   const chatData = getChatData(item, actorData, { secrets: actorData.owner });
 
