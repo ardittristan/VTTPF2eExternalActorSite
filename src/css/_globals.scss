@@ -1,7 +1,3 @@
-/* ----------------------------------------- */
-/* Configuration
-/* ----------------------------------------- */
-
 $primary-color: #5e0000 !default;
 $secondary-color: #171f69 !default; /* used for mini headers, alternate primary color */
 $tertiary-color: #e9d7a1 !default; /* compliments the primary color, usually used in combination */
@@ -46,18 +42,9 @@ $btn-frame: $tertiary-color !default;
 $btn-color: #8e0317 !default;
 $btn-radius: 0 !default;
 
-/* ----------------------------------------- */
-/* Fonts
-/* ----------------------------------------- */
-
 @import url("https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
 @import url("https://fonts.googleapis.com/css?family=Roboto+Condensed|Tauri|Teko:500|Changa+One|DM+Serif+Text:400i&display=swap");
-// @import url('../fonts/Silkscreen/silkscreen.css');
-
-/* ----------------------------------------- */
-/* Global Settings
-/* ----------------------------------------- */
 
 :root {
   --primary: #{$primary-color};
@@ -93,10 +80,6 @@ body {
   color: var(--body);
 }
 
-/* ----------------------------------------- */
-/* Layout
-/* ----------------------------------------- */
-
 $padding: 0.5em;
 $margin: 0.5em;
 
@@ -108,10 +91,6 @@ $margin: 0.5em;
 .flex {
   display: flex;
 }
-
-/* ----------------------------------------- */
-/* Typography
-/* ----------------------------------------- */
 
 h1,
 h2,
@@ -136,7 +115,4 @@ a[href] {
   color: var(--primary);
 }
 
-/* ----------------------------------------- */
-/* Forms
-/* ----------------------------------------- */
 @import "forms";
