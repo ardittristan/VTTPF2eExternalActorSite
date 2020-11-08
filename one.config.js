@@ -47,7 +47,7 @@ module.exports = {
         rules: [
             { test: /\.(js)$/, exclude: /node_modules/, use: ['babel-loader'] },
             { test: /\.handlebars$/, loader: "handlebars-loader?helperDirs[]=" + __dirname + "/src/handlebars/helpers" },
-            { test: /\.(otf|jpg)$/, use: { loader: 'url-loader' }},
+            { test: /\.(otf|jpg|ttf)$/, use: { loader: 'url-loader' }},
             { test: /\.css$/i, use: ['style-loader', 'css-loader'] },
             { test: /\.hbs$/, loader: "handlebars-loader"},
             { test: /\.s[ac]ss$/i, use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']}
