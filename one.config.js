@@ -62,7 +62,7 @@ module.exports = {
         new HtmlWebpackPlugin({                         // packs everything into one html file
             inlineSource: '.(js|css)$',
             excludeAssets: ['fontawesome.js'],        // what to exclude from the html file
-            title: "My Sheet",                          // title of the website
+            title: "PF2e Sheet",                          // title of the website
             template: "./src/handlebars/index.hbs",     // template for output index.html
             minify: {
                 collapseWhitespace: true,
