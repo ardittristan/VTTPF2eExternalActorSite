@@ -1,6 +1,6 @@
 import Tabs from "./libs/tabs.js";
 import localize from "./handlebars/helpers/stringify";
-import { ProficiencyModifier } from "./libs/modifiers";
+import { ProficiencyModifier, initModifiers } from "./libs/modifiers";
 import { ConditionManager } from "./libs/conditions";
 import TextEditor from "./libs/TextEditor";
 import { getContainerMap } from "./libs/container";
@@ -10,9 +10,6 @@ import { ChatData } from "./libs/ChatData";
 
 TextEditor._decoder = document.createElement("textarea");
 
-/**
- * might be different for different systems, but this initializes the sheet tabs
- */
 const tabs = [
   {
     navSelector: ".sheet-navigation",
@@ -23,24 +20,15 @@ const tabs = [
 
 const _tabs = createTabHandlers();
 
-/* -------------------------------------------- */
-/*   Sheet Populator                            */
-/* -------------------------------------------- */
-
 /**
  * @param  {HandlebarsTemplatable} sheetTemplate
  * @param  {Object} actorData
  * @param  {String} baseUrl
  */
 function populateSheet(sheetTemplate, actorData, baseUrl) {
-  /**
-   * here you parse the json data into data you can send to the actor sheet
-   */
+  initModifiers(actorData);
   const data = getData(actorData, baseUrl);
 
-  /**
-   * here you send the data that the handlebars template reads from to the template
-   */
   const templateObject = {
     actor: data.actorData,
     data: data.actorData.data,
@@ -331,7 +319,6 @@ function prepareItems(actorData) {
   };
 
   // Spellbook
-  // const spellbook = {};
   const tempSpellbook = [];
   const spellcastingEntriesList = [];
   const spellbooks = [];
@@ -530,9 +517,7 @@ function prepareItems(actorData) {
 
       const rank = i.data.proficient?.value || 0;
       const proficiency = ProficiencyModifier.fromLevelAndRank(actorData.data.details.level.value, rank).modifier;
-      /* const itemBonus = Number((i.data.item || {}).value || 0);
-      i.data.itemBonus = itemBonus; */
-      i.data.value = proficiency; // + itemBonus;
+      i.data.value = proficiency;
       i.data.breakdown = `proficiency(${proficiency})`;
 
       martialSkills.push(i);
@@ -593,8 +578,6 @@ function prepareItems(actorData) {
       spellbooks[location] = spellbooks[location] || {};
 
       // Update spell to perminantly have the correct ID now
-      // console.log(`PF2e System | Prepare Actor Data | Updating location for ${i.name}`);
-      // this.actor.updateEmbeddedEntity("OwnedItem", { "_id": i._id, "data.location.value": spellcastingEntriesList[0]});
       embeddedEntityUpdate.push({ _id: i._id, "data.location.value": spellcastingEntriesList[0] });
 
       prepareSpell(actorData, spellbooks[location], i);
@@ -848,65 +831,7 @@ function noCoins() {
 
 /* -------------------------------------------- */
 
-function getSpellInfo(item, actorData) {
-  const data = JSON.parse(JSON.stringify(item.data));
-
-  const spellcastingEntry = actorData.items.find((item) => item._id === data.location.value);
-
-  if (spellcastingEntry === null || spellcastingEntry.data.type !== "spellcastingEntry") return {};
-
-  const spellDC = spellcastingEntry.data.data.spelldc.dc;
-  const spellAttack = spellcastingEntry.data.data.spelldc.value;
-
-  // Spell saving throw text and DC
-  data.isSave = data.spellType.value === "save";
-
-  if (data.isSave) {
-    data.save.dc = spellDC;
-  } else data.save.dc = spellAttack;
-  data.save.str = data.save.value ? PF2E.saves[data.save.value.toLowerCase()] : "";
-
-  // Spell attack labels
-  data.damageLabel = data.spellType.value === "heal" ? localize("PF2E.SpellTypeHeal") : localize("PF2E.DamageLabel");
-  data.isAttack = data.spellType.value === "attack";
-
-  // Combine properties
-  const props = [
-    PF2E.spellLevels[data.level.value],
-    `${localize("PF2E.SpellComponentsLabel")}: ${data.components.value}`,
-    data.range.value ? `${localize("PF2E.SpellRangeLabel")}: ${data.range.value}` : null,
-    data.target.value ? `${localize("PF2E.SpellTargetLabel")}: ${data.target.value}` : null,
-    data.area.value ? `${localize("PF2E.SpellAreaLabel")}: ${PF2E.areaSizes[data.area.value]} ${PF2E.areaTypes[data.area.areaType]}` : null,
-    data.areasize?.value ? `${localize("PF2E.SpellAreaLabel")}: ${data.areasize.value}` : null,
-    data.time.value ? `${localize("PF2E.SpellTimeLabel")}: ${data.time.value}` : null,
-    data.duration.value ? `${localize("PF2E.SpellDurationLabel")}: ${data.duration.value}` : null,
-  ];
-  data.spellLvl = {}.spellLvl;
-  if (data.level.value < parseInt(data.spellLvl, 10)) {
-    props.push(`Heightened: +${parseInt(data.spellLvl, 10) - data.level.value}`);
-  }
-  data.properties = props.filter((p) => p !== null);
-
-  const traits = [];
-  if ((data.traits.value || []).length !== 0) {
-    for (let i = 0; i < data.traits.value.length; i++) {
-      const traitsObject = {
-        label: data.traits.value[i].charAt(0).toUpperCase() + data.traits.value[i].substr(1),
-        description: CONFIG.PF2E.traitsDescriptions[data.traits.value[i]] || "",
-      };
-      traits.push(traitsObject);
-    }
-  }
-  data.traits = traits.filter((p) => p);
-  // Toggling this off for now
-  /*     data.area = data.area.value ? {
-    "label": `Area: ${CONFIG.PF2E.areaSizes[data.area.value]} ${CONFIG.PF2E.areaTypes[data.area.areaType]}`,
-    "areaType": data.area.areaType,
-    "size": data.area.value
-  } : null; */
-
-  return data;
-}
+const getSpellInfo = ChatData.spellChatData
 
 /* -------------------------------------------- */
 
@@ -998,18 +923,14 @@ function prepareSpell(actorData, spellbook, spell) {
 /* -------------------------------------------- */
 
 function preparedSpellSlots(spellcastingEntry, spellbook, actorData) {
-  // let isNPC = this.actorType === "npc";
-
   for (const [key, spl] of Object.entries(spellbook)) {
     if (spl.slots > 0) {
       for (let i = 0; i < spl.slots; i++) {
         const entrySlot = ((spellcastingEntry.data.slots[`slot${key}`] || {}).prepared || {})[i] || null;
 
         if (entrySlot && entrySlot.id) {
-          // console.log(`PF2e System | Getting item: ${entrySlot.id}: `);
           const item = actorData.items.find((item) => item._id === entrySlot.id);
           if (item) {
-            // console.log(`PF2e System | Duplicating item: ${item.name}: `, item);
             const itemCopy = JSON.parse(JSON.stringify(item));
             if (entrySlot.expended) {
               itemCopy.expended = true;

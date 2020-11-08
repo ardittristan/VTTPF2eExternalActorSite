@@ -1,16 +1,15 @@
-module.exports = function(value, options) {
-    
-    // Helper parameters
-    let dec = (options.hash['decimals'] !== undefined) ? options.hash['decimals'] : 0,
-        sign = options.hash['sign'] || false;
+module.exports = function (value, options) {
+  // Helper parameters
+  let dec = options.hash["decimals"] !== undefined ? options.hash["decimals"] : 0,
+    sign = options.hash["sign"] || false;
 
-    // Parse to float
-    value = parseFloat(value).toFixed(dec);
+  // Parse to float
+  value = parseFloat(value).toFixed(dec);
 
-    // Attach sign
-    if (sign) {
-        return (value >= 0) ? "+" + value : value;
-    } else {
-        return value;
-    }
-}
+  // Attach sign
+  if (sign) {
+    return value >= 0 ? "+" + value : value;
+  } else {
+    return value;
+  }
+};

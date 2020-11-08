@@ -1,3 +1,3 @@
-module.exports = function(value, options) {
-    return Boolean(value) ? "checked" : "";
-}
+module.exports = function (value) {
+  return Boolean(value) ? "checked" : "";
+};

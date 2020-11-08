@@ -17,6 +17,11 @@
   flex: 1;
 }
 
+.item-create .fa-plus,
+.inventory-browse .fa-search {
+  visibility: hidden;
+}
+
 .crb-style .sheet-content .spellbook .directory-list .item .inventory-list .item .item-summary p,
 .crb-style .sheet-content .feats-pane .inventory-list.directory-list .item .item-summary p {
   white-space: break-spaces;

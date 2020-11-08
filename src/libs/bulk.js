@@ -1,4 +1,4 @@
-import {groupBy} from "./container"
+import { groupBy } from "./container";
 
 export class Bulk {
   normal;
@@ -284,13 +284,13 @@ function isExtraDimensionalOrWorn(item, nestedExtraDimensionalContainer) {
 
 export function indexBulkItemsById(bulkItems = []) {
   const result = new Map();
-  bulkItems.forEach(bulkItem => fillBulkIndex(bulkItem, result));
+  bulkItems.forEach((bulkItem) => fillBulkIndex(bulkItem, result));
   return result;
 }
 
 function fillBulkIndex(bulkItem, resultMap) {
   resultMap.set(bulkItem.id, bulkItem);
-  bulkItem.holdsItems.forEach(heldBulkItem => fillBulkIndex(heldBulkItem, resultMap));
+  bulkItem.holdsItems.forEach((heldBulkItem) => fillBulkIndex(heldBulkItem, resultMap));
 }
 
 export function itemsFromActorData(actorData) {
@@ -298,35 +298,33 @@ export function itemsFromActorData(actorData) {
 }
 
 function toBulkItems(items) {
-  const allIds = new Set(items.map(item => item._id));
-  const itemsInContainers = groupBy(items, item => {
-      // we want all items in the top level group that are in no container
-      // or are never referenced because we don't want the items to
-      // disappear if the container is being deleted or doesn't have a reference
-      const ref = item.data?.containerId?.value ?? null;
-      if (ref === null || !allIds.has(ref)) {
-          return null;
-      }
-      return ref;
+  const allIds = new Set(items.map((item) => item._id));
+  const itemsInContainers = groupBy(items, (item) => {
+    // we want all items in the top level group that are in no container
+    // or are never referenced because we don't want the items to
+    // disappear if the container is being deleted or doesn't have a reference
+    const ref = item.data?.containerId?.value ?? null;
+    if (ref === null || !allIds.has(ref)) {
+      return null;
+    }
+    return ref;
   });
   if (itemsInContainers.has(null)) {
-      const topLevelItems = itemsInContainers.get(null);
-      return buildContainerTree(topLevelItems, itemsInContainers);
+    const topLevelItems = itemsInContainers.get(null);
+    return buildContainerTree(topLevelItems, itemsInContainers);
   }
   return [];
 }
 
 function buildContainerTree(items, groupedItems) {
-  return items
-      .map((item) => {
-          const itemId = item._id;
-          if (itemId !== null && itemId !== undefined && groupedItems.has(itemId)) {
-              const itemsInContainer = buildContainerTree(groupedItems.get(itemId), groupedItems);
-              return toBulkItem(item, itemsInContainer);
-          }
-          return toBulkItem(item);
-
-      });
+  return items.map((item) => {
+    const itemId = item._id;
+    if (itemId !== null && itemId !== undefined && groupedItems.has(itemId)) {
+      const itemsInContainer = buildContainerTree(groupedItems.get(itemId), groupedItems);
+      return toBulkItem(item, itemsInContainer);
+    }
+    return toBulkItem(item);
+  });
 }
 
 function toBulkItem(item, nestedItems = []) {
@@ -338,97 +336,96 @@ function toBulkItem(item, nestedItems = []) {
   const unequippedBulk = item.data?.unequippedBulk?.value;
   const stackGroup = item.data?.stackGroup?.value;
   const negateBulk = item.data?.negateBulk?.value;
-  const extraDimensionalContainer = item.data?.traits?.value?.includes('extradimensional') ?? false;
+  const extraDimensionalContainer = item.data?.traits?.value?.includes("extradimensional") ?? false;
 
   return new BulkItem({
-      id,
-      bulk: weightToBulk(normalizeWeight(weight)) ?? new Bulk(),
-      negateBulk: weightToBulk(normalizeWeight(negateBulk)) ?? new Bulk(),
-      // this stuff overrides bulk so we don't want to default to 0 bulk if undefined
-      unequippedBulk: weightToBulk(normalizeWeight(unequippedBulk)),
-      equippedBulk: weightToBulk(normalizeWeight(equippedBulk)),
-      holdsItems: nestedItems,
-      stackGroup,
-      isEquipped,
-      quantity,
-      extraDimensionalContainer,
+    id,
+    bulk: weightToBulk(normalizeWeight(weight)) ?? new Bulk(),
+    negateBulk: weightToBulk(normalizeWeight(negateBulk)) ?? new Bulk(),
+    // this stuff overrides bulk so we don't want to default to 0 bulk if undefined
+    unequippedBulk: weightToBulk(normalizeWeight(unequippedBulk)),
+    equippedBulk: weightToBulk(normalizeWeight(equippedBulk)),
+    holdsItems: nestedItems,
+    stackGroup,
+    isEquipped,
+    quantity,
+    extraDimensionalContainer,
   });
 }
 
 function normalizeWeight(weight) {
   if (weight === null || weight === undefined) {
-      return undefined;
+    return undefined;
   }
   // turn numbers into strings
   const stringWeight = `${weight}`;
-  return stringWeight.toLowerCase()
-      .trim();
+  return stringWeight.toLowerCase().trim();
 }
 
 function isPhysicalItem(item) {
-  return ('data' in item) && ('quantity' in item.data);
+  return "data" in item && "quantity" in item.data;
 }
 
 export const stacks = {
   bolts: {
-      size: 10,
-      lightBulk: 1,
+    size: 10,
+    lightBulk: 1,
   },
   arrows: {
-      size: 10,
-      lightBulk: 1,
+    size: 10,
+    lightBulk: 1,
   },
   slingBullets: {
-      size: 10,
-      lightBulk: 1,
+    size: 10,
+    lightBulk: 1,
   },
   blowgunDarts: {
-      size: 10,
-      lightBulk: 1,
+    size: 10,
+    lightBulk: 1,
   },
   rations: {
-      size: 7,
-      lightBulk: 1,
+    size: 7,
+    lightBulk: 1,
   },
   coins: {
-      size: 1000,
-      lightBulk: 10,
+    size: 1000,
+    lightBulk: 10,
   },
   gems: {
-      size: 2000,
-      lightBulk: 10,
+    size: 2000,
+    lightBulk: 10,
   },
 };
 
 export const bulkConversions = {
   Tiny: {
-      bulkLimitFactor: 0.5,
-      treatsAsLight: '-',
-      treatsAsNegligible: null,
+    bulkLimitFactor: 0.5,
+    treatsAsLight: "-",
+    treatsAsNegligible: null,
   },
   Small: {
-      bulkLimitFactor: 1,
-      treatsAsLight: 'L',
-      treatsAsNegligible: '-',
+    bulkLimitFactor: 1,
+    treatsAsLight: "L",
+    treatsAsNegligible: "-",
   },
   Medium: {
-      bulkLimitFactor: 1,
-      treatsAsLight: 'L',
-      treatsAsNegligible: '-',
+    bulkLimitFactor: 1,
+    treatsAsLight: "L",
+    treatsAsNegligible: "-",
   },
   Large: {
-      bulkLimitFactor: 2,
-      treatsAsLight: '1',
-      treatsAsNegligible: 'L',
+    bulkLimitFactor: 2,
+    treatsAsLight: "1",
+    treatsAsNegligible: "L",
   },
   Huge: {
-      bulkLimitFactor: 4,
-      treatsAsLight: '2',
-      treatsAsNegligible: '1',
+    bulkLimitFactor: 4,
+    treatsAsLight: "2",
+    treatsAsNegligible: "1",
   },
   Gargantuan: {
-      bulkLimitFactor: 8,
-      treatsAsLight: '4',
-      treatsAsNegligible: '2',
+    bulkLimitFactor: 8,
+    treatsAsLight: "4",
+    treatsAsNegligible: "2",
   },
 };
