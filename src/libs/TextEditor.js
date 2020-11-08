@@ -77,7 +77,7 @@ export default class TextEditor {
       cls: ["entity-link"],
       icon: null,
       dataset: {},
-      name: name,
+      name: name || target.replace(/.*\./g, ""),
     };
 
     const a = document.createElement("a");
@@ -103,18 +103,13 @@ export default class TextEditor {
   static _createInlineRoll(match, command, formula, closing) {
     const data = {
       cls: ["inline-roll"],
-      dataset: {},
     };
 
     if (closing.length === 3) formula += "]";
 
     const a = document.createElement("a");
     a.classList.add(...data.cls);
-    a.title = data.title;
-    for (let [k, v] of Object.entries(data.dataset)) {
-      a.dataset[k] = v;
-    }
-    a.innerHTML = `<i class="fas fa-dice-d20"></i> ${data.result}`;
+    a.innerHTML = `<i class="fas fa-dice-d20"></i> ${formula}`;
     return a;
   }
 }

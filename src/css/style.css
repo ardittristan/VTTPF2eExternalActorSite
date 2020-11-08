@@ -54,8 +54,7 @@
   visibility: hidden;
 }
 
-.crb-style .sheet-content .spellbook .directory-list .item .inventory-list .item .item-summary p,
-.crb-style .sheet-content .feats-pane .inventory-list.directory-list .item .item-summary p {
+.crb-style .sheet-content .directory-list .item .item-summary p {
   white-space: break-spaces;
 }
 
