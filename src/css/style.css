@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Eczar:wght@400;500;600;700;800&display=swap');
-@import url('https://rsms.me/inter/inter.css');
+@import url("https://fonts.googleapis.com/css2?family=Eczar:wght@400;500;600;700;800&display=swap");
+@import url("https://rsms.me/inter/inter.css");
 
 .window-content {
   height: calc(100% - var(--headerHeight));
@@ -17,8 +17,40 @@
   flex: 1;
 }
 
+.window-content input,
+.window-content label,
+.window-content select {
+  pointer-events: none !important;
+}
+
+.window-content .roll-icon,
+.window-content .player-image,
+.window-content .dots *,
+.window-content .plaque span,
+.window-content .save-rank,
+.window-content button.tag,
+.window-content a.entity-link,
+.window-content a.inline-roll,
+.window-content .item-image,
+.window-content .item-icon,
+.window-content .item-toggle-equip,
+.window-content .item-toggle-container,
+.window-content .pf-value.pf-rank,
+.window-content .rollable {
+  cursor: default !important;
+}
+
+.window-content .shield.hp .data-value:hover #shield-hp,
+.window-content button.tag:hover,
+.window-content a.entity-link:hover,
+.window-content a.inline-roll:hover {
+  text-shadow: none !important;
+}
+
 .item-create .fa-plus,
-.inventory-browse .fa-search {
+.inventory-browse .fa-search,
+.window-content .item-decrease-quantity,
+.window-content .item-increase-quantity {
   visibility: hidden;
 }
 
@@ -29,7 +61,7 @@
 
 .bio-alignment.pf-value.pf-small {
   font-weight: 700;
-  display:block;
+  display: block;
   font-size: 14px;
   margin-top: 2px;
   text-transform: capitalize;

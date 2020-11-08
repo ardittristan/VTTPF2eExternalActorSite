@@ -38,11 +38,6 @@
           height: 32px;
           width: 32px;
 
-          &:hover {
-            background: none !important;
-            color: var(--primary);
-          }
-
           &[style*="mystery-man"] {
             background-size: 24px;
           }

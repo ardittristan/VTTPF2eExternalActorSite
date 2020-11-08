@@ -69,15 +69,6 @@
           / 42px 2fr 1fr;
         align-items: center;
 
-        .rollable {
-          cursor: pointer;
-          &:hover {
-            color: var(--primary);
-            text-shadow: 0 0 2px white;
-            text-decoration: underline;
-          }
-        }
-
         .skill-score {
           grid-area: score;
           margin-right: 4px;
