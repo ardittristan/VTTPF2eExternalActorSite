@@ -1179,7 +1179,7 @@ globalThis.Hooks = new EventEmitter3();
 if (document.location.hostname === "localhost") {
   globalThis.proxyUrl = "";
 } else {
-  globalThis.proxyUrl = "https://cors-anywhere.herokuapp.com/";
+  globalThis.proxyUrl = "https://cors-anywhere.ardittristan.workers.dev/corsproxy/?apiurl=";
 }
 
 globalThis.i18n = lang;

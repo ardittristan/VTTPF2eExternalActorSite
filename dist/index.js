@@ -3489,7 +3489,7 @@ module.exports = {
 			}
 		}
 
-		return object;
+		return object === undefined ? value : object;
 	},
 
 	set(object, path, value) {

@@ -164,7 +164,7 @@ module.exports = {
 			}
 		}
 
-		return object;
+		return object === undefined ? value : object;
 	},
 
 	set(object, path, value) {
@@ -1621,7 +1621,7 @@ const ChatData = {
     data.damageLabel = data.spellType.value === "heal" ? stringify_default()("PF2E.SpellTypeHeal") : stringify_default()("PF2E.DamageLabel");
     data.isAttack = data.spellType.value === "attack"; // Combine properties
 
-    const props = [PF2E.spellLevels[data.level.value], `${stringify_default()("PF2E.SpellComponentsLabel")}: ${data.components.value}`, data.range.value ? `${stringify_default()("PF2E.SpellRangeLabel")}: ${data.range.value}` : null, data.target.value ? `${stringify_default()("PF2E.SpellTargetLabel")}: ${data.target.value}` : null, data.area.value ? `${stringify_default()("PF2E.SpellAreaLabel")}: ${PF2E.areaSizes[data.area.value]} ${PF2E.areaTypes[data.area.areaType]}` : null, ((_data$areasize = data.areasize) === null || _data$areasize === void 0 ? void 0 : _data$areasize.value) ? `${stringify_default()("PF2E.SpellAreaLabel")}: ${data.areasize.value}` : null, data.time.value ? `${stringify_default()("PF2E.SpellTimeLabel")}: ${data.time.value}` : null, data.duration.value ? `${stringify_default()("PF2E.SpellDurationLabel")}: ${data.duration.value}` : null];
+    const props = [PF2E.spellLevels[data.level.value], `${stringify_default()("PF2E.SpellComponentsLabel")}: ${data.components.value}`, data.range.value ? `${stringify_default()("PF2E.SpellRangeLabel")}: ${data.range.value}` : null, data.target.value ? `${stringify_default()("PF2E.SpellTargetLabel")}: ${data.target.value}` : null, data.area.value ? `${stringify_default()("PF2E.SpellAreaLabel")}: ${PF2E.areaSizes[data.area.value]} ${PF2E.areaTypes[data.area.areaType]}` : null, (_data$areasize = data.areasize) !== null && _data$areasize !== void 0 && _data$areasize.value ? `${stringify_default()("PF2E.SpellAreaLabel")}: ${data.areasize.value}` : null, data.time.value ? `${stringify_default()("PF2E.SpellTimeLabel")}: ${data.time.value}` : null, data.duration.value ? `${stringify_default()("PF2E.SpellDurationLabel")}: ${data.duration.value}` : null];
     data.spellLvl = {}.spellLvl;
 
     if (data.level.value < parseInt(data.spellLvl, 10)) {
@@ -1890,17 +1890,17 @@ function getData(actorData, baseUrl) {
   let items = actorData.items;
   items.sort((a, b) => (a.sort || 0) - (b.sort || 0)); // alignment translate
 
-  if ((_actorData$data$detai = actorData.data.details) === null || _actorData$data$detai === void 0 ? void 0 : (_actorData$data$detai2 = _actorData$data$detai.alignment) === null || _actorData$data$detai2 === void 0 ? void 0 : _actorData$data$detai2.value) {
+  if ((_actorData$data$detai = actorData.data.details) !== null && _actorData$data$detai !== void 0 && (_actorData$data$detai2 = _actorData$data$detai.alignment) !== null && _actorData$data$detai2 !== void 0 && _actorData$data$detai2.value) {
     actorData.data.details.alignment.value = PF2E.alignment[actorData.data.details.alignment.value];
   } // size translate
 
 
-  if ((_actorData$data$trait = actorData.data.traits) === null || _actorData$data$trait === void 0 ? void 0 : (_actorData$data$trait2 = _actorData$data$trait.size) === null || _actorData$data$trait2 === void 0 ? void 0 : _actorData$data$trait2.value) {
+  if ((_actorData$data$trait = actorData.data.traits) !== null && _actorData$data$trait !== void 0 && (_actorData$data$trait2 = _actorData$data$trait.size) !== null && _actorData$data$trait2 !== void 0 && _actorData$data$trait2.value) {
     actorData.data.traits.size.value = PF2E.actorSizes[actorData.data.traits.size.value];
   } // key ability translate
 
 
-  if ((_actorData$data$detai3 = actorData.data.details) === null || _actorData$data$detai3 === void 0 ? void 0 : (_actorData$data$detai4 = _actorData$data$detai3.keyability) === null || _actorData$data$detai4 === void 0 ? void 0 : _actorData$data$detai4.value) {
+  if ((_actorData$data$detai3 = actorData.data.details) !== null && _actorData$data$detai3 !== void 0 && (_actorData$data$detai4 = _actorData$data$detai3.keyability) !== null && _actorData$data$detai4 !== void 0 && _actorData$data$detai4.value) {
     actorData.data.details.keyability.value = PF2E.abilities[actorData.data.details.keyability.value];
   } // ability labels
 
@@ -1938,17 +1938,17 @@ function getData(actorData, baseUrl) {
   } // perception text
 
 
-  if ((_actorData$data$attri = actorData.data.attributes) === null || _actorData$data$attri === void 0 ? void 0 : (_actorData$data$attri2 = _actorData$data$attri.perception) === null || _actorData$data$attri2 === void 0 ? void 0 : _actorData$data$attri2.rank) {
+  if ((_actorData$data$attri = actorData.data.attributes) !== null && _actorData$data$attri !== void 0 && (_actorData$data$attri2 = _actorData$data$attri.perception) !== null && _actorData$data$attri2 !== void 0 && _actorData$data$attri2.rank) {
     actorData.data.attributes.perception.rankName = PF2E.proficiencyLevels[actorData.data.attributes.perception.rank];
   } // class dc text
 
 
-  if ((_actorData$data$attri3 = actorData.data.attributes) === null || _actorData$data$attri3 === void 0 ? void 0 : (_actorData$data$attri4 = _actorData$data$attri3.classDC) === null || _actorData$data$attri4 === void 0 ? void 0 : _actorData$data$attri4.rank) {
+  if ((_actorData$data$attri3 = actorData.data.attributes) !== null && _actorData$data$attri3 !== void 0 && (_actorData$data$attri4 = _actorData$data$attri3.classDC) !== null && _actorData$data$attri4 !== void 0 && _actorData$data$attri4.rank) {
     actorData.data.attributes.classDC.rankName = PF2E.proficiencyLevels[actorData.data.attributes.classDC.rank];
   } // martial skills
 
 
-  if ((_actorData$data = actorData.data) === null || _actorData$data === void 0 ? void 0 : _actorData$data.martial) {
+  if ((_actorData$data = actorData.data) !== null && _actorData$data !== void 0 && _actorData$data.martial) {
     for (const [s, skl] of Object.entries(actorData.data.martial)) {
       skl.icon = getProficiencyIcon(skl.rank);
       skl.hover = PF2E.proficiencyLevels[skl.rank];
@@ -1958,7 +1958,7 @@ function getData(actorData, baseUrl) {
   } // skill labels
 
 
-  if ((_actorData$data2 = actorData.data) === null || _actorData$data2 === void 0 ? void 0 : _actorData$data2.skills) {
+  if ((_actorData$data2 = actorData.data) !== null && _actorData$data2 !== void 0 && _actorData$data2.skills) {
     for (const [s, skl] of Object.entries(actorData.data.skills)) {
       var _skl$label;
 
